@@ -4,6 +4,8 @@ import ProjectForm from './components/ProjectForm';
 import WizardNavigation from './components/WizardNavigation';
 import PhaseAccordion from './components/PhaseAccordion';
 import ProjectTypeSelector from './components/ProjectTypeSelector';
+import GuidelinesSection from './components/GuidelinesSection';
+import StoryDrivenPrompts from './components/StoryDrivenPrompts';
 import { projectBlueprints } from './data/projectBlueprints';
 
 export type ProjectType = keyof typeof projectBlueprints;
@@ -53,25 +55,60 @@ function App() {
       />
     },
     {
-      title: "Project Prompts",
+      title: "Development Guide",
       component: (
         <div className="space-y-8">
+          <GuidelinesSection />
+          
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">Development Guide Prompts</h2>
-                <p className="mt-1 text-sm text-gray-500">
-                  Use these prompts with the recommended tools to guide your development process
-                </p>
-              </div>
+            <div>
+              <h2 className="text-lg font-medium text-gray-900">Project Setup & Structure</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Initial project setup and architecture guidelines
+              </p>
             </div>
             
             <PhaseAccordion 
               phases={phases.filter(phase => {
+                if (phase.title === "Project Definition") return true;
                 if (phase.title === "Backend Development") {
                   return projectConfig.needsBackend;
                 }
-                return true;
+                return false;
+              })}
+              projectDetails={projectDetails}
+              projectConfig={projectConfig}
+              onCopy={copyToClipboard}
+              expandAll
+            />
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-lg font-medium text-gray-900">Story-Driven Development</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Select a user story to get phase-specific development prompts
+              </p>
+            </div>
+            
+            <StoryDrivenPrompts 
+              projectDetails={projectDetails}
+              projectConfig={projectConfig}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-lg font-medium text-gray-900">Deployment & Operations</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Guidelines for deploying and maintaining your application
+              </p>
+            </div>
+            
+            <PhaseAccordion 
+              phases={phases.filter(phase => {
+                if (phase.title === "Testing & Deployment" || phase.title === "Debugging & Optimization") return true;
+                return false;
               })}
               projectDetails={projectDetails}
               projectConfig={projectConfig}
