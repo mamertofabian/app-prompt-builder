@@ -5,6 +5,7 @@ import type { ProjectType } from '../App';
 interface SubPhase {
   title: string;
   description: string;
+  tool: string;
   prompt: string;
 }
 
@@ -118,7 +119,10 @@ function PhaseAccordion({
                     >
                       <div className="flex flex-col items-start">
                         <span className="font-medium text-gray-900">{subPhase.title}</span>
-                        <span className="text-sm text-gray-500">{subPhase.description}</span>
+                        <div className="text-sm">
+                          <span className="text-gray-500">{subPhase.description}</span>
+                          <span className="text-indigo-600 ml-2">• {subPhase.tool}</span>
+                        </div>
                       </div>
                       {expandedSubPhases.includes(`${phaseIndex}-${subIndex}`) ? (
                         <ChevronDown className="h-5 w-5 text-gray-500" />

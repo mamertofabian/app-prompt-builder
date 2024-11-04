@@ -8,6 +8,7 @@ interface ListEditorProps {
   onChange: (index: number, value: string) => void;
   placeholder?: string;
   inputType?: 'input' | 'textarea';
+  rows?: number;
 }
 
 function ListEditor({
@@ -16,7 +17,8 @@ function ListEditor({
   onRemove,
   onChange,
   placeholder = '',
-  inputType = 'input'
+  inputType = 'input',
+  rows = 2
 }: ListEditorProps) {
   return (
     <div className="space-y-2">
@@ -28,7 +30,7 @@ function ListEditor({
               onChange={(e) => onChange(index, e.target.value)}
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               placeholder={placeholder}
-              rows={2}
+              rows={rows}
             />
           ) : (
             <input

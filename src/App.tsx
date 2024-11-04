@@ -4,7 +4,6 @@ import ProjectForm from './components/ProjectForm';
 import WizardNavigation from './components/WizardNavigation';
 import PhaseAccordion from './components/PhaseAccordion';
 import ProjectTypeSelector from './components/ProjectTypeSelector';
-import GuidelinesSection from './components/GuidelinesSection';
 import { projectBlueprints } from './data/projectBlueprints';
 
 export type ProjectType = keyof typeof projectBlueprints;
@@ -54,17 +53,15 @@ function App() {
       />
     },
     {
-      title: "Guidelines & Prompts",
+      title: "Project Prompts",
       component: (
         <div className="space-y-8">
-          <GuidelinesSection />
-          
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
                 <h2 className="text-lg font-medium text-gray-900">Development Guide Prompts</h2>
                 <p className="mt-1 text-sm text-gray-500">
-                  Use these prompts to guide your development process
+                  Use these prompts with the recommended tools to guide your development process
                 </p>
               </div>
             </div>

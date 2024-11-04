@@ -19,7 +19,13 @@ function UserStoriesSection({
     return `Help me create detailed user stories for ${projectName || '[Project Name]'}. Consider these core features:
 ${features.filter(f => f).map(f => `- ${f}`).join('\n')}
 
-Please format them as "As a [user], I want to [action] so that [benefit]." and include acceptance criteria for each story.`;
+For each user story:
+1. Format as "As a [user], I want to [action] so that [benefit]"
+2. Include acceptance criteria in the format:
+   Given [context]
+   When [action]
+   Then [expected result]
+3. Consider edge cases and error scenarios`;
   };
 
   const copyToClipboard = (text: string) => {
@@ -45,7 +51,7 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
           <div>
             <h3 className="text-sm font-medium text-gray-900">User Stories Generator</h3>
             <p className="text-xs text-gray-500 mt-1">
-              Use this prompt to generate user stories based on your features
+              Use this prompt to generate user stories with acceptance criteria
             </p>
           </div>
         </div>
@@ -70,7 +76,7 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
           <div>
             <h3 className="text-sm font-medium text-gray-900">User Stories</h3>
             <p className="text-xs text-gray-500 mt-1">
-              Add the generated user stories here
+              Add each user story with its acceptance criteria as a separate entry
             </p>
           </div>
         </div>
@@ -81,8 +87,14 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
             onAdd={addStory}
             onRemove={removeStory}
             onChange={updateStory}
-            placeholder="As a [user], I want to [action] so that [benefit]"
+            placeholder={`As a [user], I want to [action] so that [benefit]
+
+Acceptance Criteria:
+Given [context]
+When [action]
+Then [expected result]`}
             inputType="textarea"
+            rows={6}
           />
         </div>
       </div>
