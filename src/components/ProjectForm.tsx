@@ -54,10 +54,10 @@ function ProjectForm({ projectDetails, setProjectDetails, projectConfig }: Proje
 
     setProjectDetails(prev => ({
       ...prev,
-      features: [...defaultFeatures, ...prev.features.filter(f => f !== '')],
-      techStack: [...defaultTechStack, ...prev.techStack.filter(t => t !== '')]
+      features: defaultFeatures,
+      techStack: defaultTechStack
     }));
-  }, [projectConfig.type]);
+  }, [projectConfig.type, projectConfig.needsBackend, projectConfig.needsDatabase]);
 
   return (
     <div className="space-y-6">

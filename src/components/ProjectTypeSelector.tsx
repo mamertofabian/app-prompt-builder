@@ -45,39 +45,61 @@ function ProjectTypeSelector({ projectConfig, setProjectConfig }: ProjectTypeSel
             <button
               key={blueprint.type}
               onClick={() => handleTypeSelect(blueprint.type as ProjectType)}
-              className={`relative rounded-lg border p-4 flex flex-col space-y-4 ${
+              className={`relative rounded-lg border p-4 flex flex-col h-full text-left ${
                 projectConfig.type === blueprint.type
                   ? 'border-indigo-600 ring-2 ring-indigo-600'
                   : 'border-gray-200 hover:border-indigo-400'
               }`}
             >
-              <div className="flex items-start space-x-4">
+              {/* Header Section */}
+              <div className="flex items-start space-x-4 mb-4">
                 <div className={`shrink-0 ${
                   projectConfig.type === blueprint.type ? 'text-indigo-600' : 'text-gray-600'
                 }`}>
                   <Icon className="h-6 w-6" />
                 </div>
-                <div className="flex-1">
-                  <h3 className={`font-medium ${
+                <div className="min-w-0 flex-1">
+                  <h3 className={`font-medium truncate ${
                     projectConfig.type === blueprint.type ? 'text-indigo-600' : 'text-gray-900'
                   }`}>
                     {blueprint.label}
                   </h3>
-                  <p className="mt-1 text-sm text-gray-500">{blueprint.description}</p>
+                  <p className="mt-1 text-sm text-gray-500 line-clamp-2">{blueprint.description}</p>
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm text-gray-500">
-                <h4 className="font-medium text-gray-700">Includes:</h4>
-                <ul className="list-disc list-inside space-y-1">
+              {/* Features Section */}
+              <div className="mt-auto pt-4 border-t border-gray-100">
+                <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2">
+                  Includes:
+                </h4>
+                <ul className="space-y-1">
                   {blueprint.structure.frontend && (
-                    <li>Frontend Development</li>
+                    <li className="text-sm text-gray-600 flex items-center">
+                      <span className="w-2 h-2 bg-indigo-400 rounded-full mr-2"></span>
+                      Frontend Development
+                      {blueprint.structure.frontend.required && (
+                        <span className="ml-1 text-xs text-gray-400">(Required)</span>
+                      )}
+                    </li>
                   )}
                   {blueprint.structure.backend && (
-                    <li>Backend Services {blueprint.structure.backend.required ? '(Required)' : '(Optional)'}</li>
+                    <li className="text-sm text-gray-600 flex items-center">
+                      <span className="w-2 h-2 bg-indigo-400 rounded-full mr-2"></span>
+                      Backend Services
+                      {blueprint.structure.backend.required && (
+                        <span className="ml-1 text-xs text-gray-400">(Required)</span>
+                      )}
+                    </li>
                   )}
                   {blueprint.structure.database && (
-                    <li>Database Integration {blueprint.structure.database.required ? '(Required)' : '(Optional)'}</li>
+                    <li className="text-sm text-gray-600 flex items-center">
+                      <span className="w-2 h-2 bg-indigo-400 rounded-full mr-2"></span>
+                      Database Integration
+                      {blueprint.structure.database.required && (
+                        <span className="ml-1 text-xs text-gray-400">(Required)</span>
+                      )}
+                    </li>
                   )}
                 </ul>
               </div>
