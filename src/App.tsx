@@ -4,6 +4,7 @@ import ProjectForm from './components/ProjectForm';
 import WizardNavigation from './components/WizardNavigation';
 import PhaseAccordion from './components/PhaseAccordion';
 import ProjectTypeSelector from './components/ProjectTypeSelector';
+import GuidelinesSection from './components/GuidelinesSection';
 import { projectBlueprints } from './data/projectBlueprints';
 
 export type ProjectType = keyof typeof projectBlueprints;
@@ -53,30 +54,34 @@ function App() {
       />
     },
     {
-      title: "Project Prompts",
+      title: "Guidelines & Prompts",
       component: (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">Development Guide Prompts</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Use these prompts to guide your development process
-              </p>
-            </div>
-          </div>
+        <div className="space-y-8">
+          <GuidelinesSection />
           
-          <PhaseAccordion 
-            phases={phases.filter(phase => {
-              if (phase.title === "Backend Development") {
-                return projectConfig.needsBackend;
-              }
-              return true;
-            })}
-            projectDetails={projectDetails}
-            projectConfig={projectConfig}
-            onCopy={copyToClipboard}
-            expandAll
-          />
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-lg font-medium text-gray-900">Development Guide Prompts</h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  Use these prompts to guide your development process
+                </p>
+              </div>
+            </div>
+            
+            <PhaseAccordion 
+              phases={phases.filter(phase => {
+                if (phase.title === "Backend Development") {
+                  return projectConfig.needsBackend;
+                }
+                return true;
+              })}
+              projectDetails={projectDetails}
+              projectConfig={projectConfig}
+              onCopy={copyToClipboard}
+              expandAll
+            />
+          </div>
         </div>
       )
     }

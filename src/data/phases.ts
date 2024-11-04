@@ -199,5 +199,66 @@ User stories implemented:
 [USER_STORIES]`
       }
     ]
+  },
+  {
+    title: "Debugging & Optimization",
+    description: "Troubleshoot issues and optimize performance.",
+    subPhases: [
+      {
+        title: "Error Resolution",
+        description: "Debug and fix application issues.",
+        prompt: `I'm encountering the following error in [PROJECT_NAME]:
+[ERROR_DESCRIPTION]
+
+Context:
+- Feature: [AFFECTED_FEATURE]
+- Tech Stack: [TECH_STACK]
+- Current Implementation: [CODE_SNIPPET]
+
+Please help identify:
+1. Potential causes
+2. Debugging steps
+3. Recommended fixes
+4. Prevention strategies`
+      },
+      {
+        title: "Performance Analysis",
+        description: "Identify and resolve performance bottlenecks.",
+        prompt: `The following component/feature in [PROJECT_NAME] is experiencing performance issues:
+[PERFORMANCE_ISSUE]
+
+Current implementation:
+[CODE_SNIPPET]
+
+Tech stack:
+[TECH_STACK]
+
+Please provide:
+1. Performance analysis
+2. Optimization strategies
+3. Implementation recommendations
+4. Monitoring approach`
+      },
+      {
+        title: "Integration Troubleshooting",
+        description: "Resolve integration and communication issues.",
+        prompt: `There's an integration issue between [COMPONENT_A] and [COMPONENT_B] in [PROJECT_NAME]:
+
+Frontend Implementation:
+[FRONTEND_CODE]
+
+Backend Implementation:
+[BACKEND_CODE]
+
+Tech Stack:
+[TECH_STACK]
+
+Please help with:
+1. Communication flow analysis
+2. Error handling review
+3. Integration fixes
+4. Testing strategies`
+      }
+    ]
   }
 ];
