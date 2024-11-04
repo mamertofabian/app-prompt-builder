@@ -4,8 +4,9 @@ import ProjectForm from './components/ProjectForm';
 import WizardNavigation from './components/WizardNavigation';
 import PhaseAccordion from './components/PhaseAccordion';
 import ProjectTypeSelector from './components/ProjectTypeSelector';
+import { projectBlueprints } from './data/projectBlueprints';
 
-export type ProjectType = 'static' | 'fullstack' | 'backend' | 'mobile';
+export type ProjectType = keyof typeof projectBlueprints;
 
 interface ProjectConfig {
   type: ProjectType;

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, X, Copy } from 'lucide-react';
-import PresetSelector from './PresetSelector';
-import { techStackOptions, featureCategories } from '../data/presets';
+import { projectBlueprints } from '../data/projectBlueprints';
+import type { ProjectType } from '../App';
 
 interface ProjectFormProps {
   projectDetails: {
@@ -18,11 +18,46 @@ interface ProjectFormProps {
     techStack: string[];
     userStories: string[];
   }>>;
+  projectConfig: {
+    type: ProjectType;
+    needsBackend: boolean;
+    needsDatabase: boolean;
+    needsAuthentication: boolean;
+  };
 }
 
-function ProjectForm({ projectDetails, setProjectDetails }: ProjectFormProps) {
+function ProjectForm({ projectDetails, setProjectDetails, projectConfig }: ProjectFormProps) {
   const [showTechPresets, setShowTechPresets] = useState(false);
   const [showFeaturePresets, setShowFeaturePresets] = useState(false);
+
+  const blueprint = projectBlueprints[projectConfig.type];
+
+  // Initialize with default features and tech stack when project type changes
+  useEffect(() => {
+    const defaultFeatures = blueprint.defaultFeatures
+      .filter(f => f.isDefault)
+      .filter(f => {
+        if (f.requiresBackend && !projectConfig.needsBackend) return false;
+        if (f.requiresDatabase && !projectConfig.needsDatabase) return false;
+        return true;
+      })
+      .map(f => f.name);
+
+    const defaultTechStack = blueprint.recommendedTechStack
+      .filter(t => t.isDefault)
+      .filter(t => {
+        if (t.requiresBackend && !projectConfig.needsBackend) return false;
+        if (t.requiresDatabase && !projectConfig.needsDatabase) return false;
+        return true;
+      })
+      .map(t => t.name);
+
+    setProjectDetails(prev => ({
+      ...prev,
+      features: [...defaultFeatures, ...prev.features.filter(f => f !== '')],
+      techStack: [...defaultTechStack, ...prev.techStack.filter(t => t !== '')]
+    }));
+  }, [projectConfig.type]);
 
   const addListItem = (field: 'features' | 'techStack' | 'userStories') => {
     setProjectDetails(prev => ({
@@ -77,6 +112,7 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
           value={projectDetails.name}
           onChange={(e) => setProjectDetails(prev => ({ ...prev, name: e.target.value }))}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          placeholder="Enter your project name"
         />
       </div>
 
@@ -90,6 +126,7 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
           value={projectDetails.description}
           onChange={(e) => setProjectDetails(prev => ({ ...prev, description: e.target.value }))}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          placeholder="Describe your project's purpose and goals"
         />
       </div>
 
@@ -97,7 +134,12 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
         <div className="border rounded-lg overflow-hidden">
           <div className="bg-gray-50 px-4 py-3 border-b">
             <div className="flex justify-between items-center">
-              <label className="block text-sm font-medium text-gray-700">Features</label>
+              <div>
+                <h3 className="text-sm font-medium text-gray-900">Features</h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select from recommended features or add custom ones
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowFeaturePresets(!showFeaturePresets)}
@@ -110,11 +152,38 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
           
           <div className="p-4">
             {showFeaturePresets && (
-              <div className="mb-4">
-                <PresetSelector
-                  options={featureCategories}
-                  onSelect={(option) => addPresetOption('features', option.value)}
-                />
+              <div className="space-y-4">
+                {['core', 'optional', 'advanced'].map(category => {
+                  const features = [...blueprint.defaultFeatures, ...blueprint.suggestedFeatures]
+                    .filter(f => f.category === category)
+                    .filter(f => {
+                      if (f.requiresBackend && !projectConfig.needsBackend) return false;
+                      if (f.requiresDatabase && !projectConfig.needsDatabase) return false;
+                      return true;
+                    });
+
+                  if (features.length === 0) return null;
+
+                  return (
+                    <div key={category}>
+                      <h4 className="text-sm font-medium text-gray-700 capitalize mb-2">
+                        {category} Features
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {features.map(feature => (
+                          <button
+                            key={feature.id}
+                            onClick={() => addPresetOption('features', feature.name)}
+                            className="text-left p-3 rounded-lg border border-gray-200 hover:border-indigo-500 hover:bg-indigo-50 transition-colors"
+                          >
+                            <div className="font-medium text-gray-900">{feature.name}</div>
+                            <div className="text-sm text-gray-500">{feature.description}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -150,7 +219,12 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
         <div className="border rounded-lg overflow-hidden">
           <div className="bg-gray-50 px-4 py-3 border-b">
             <div className="flex justify-between items-center">
-              <label className="block text-sm font-medium text-gray-700">Tech Stack</label>
+              <div>
+                <h3 className="text-sm font-medium text-gray-900">Tech Stack</h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Choose recommended technologies or add your own
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowTechPresets(!showTechPresets)}
@@ -163,11 +237,38 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
 
           <div className="p-4">
             {showTechPresets && (
-              <div className="mb-4">
-                <PresetSelector
-                  options={techStackOptions}
-                  onSelect={(option) => addPresetOption('techStack', option.value)}
-                />
+              <div className="space-y-4">
+                {['frontend', 'backend', 'database', 'deployment', 'testing'].map(category => {
+                  const technologies = blueprint.recommendedTechStack
+                    .filter(t => t.category === category)
+                    .filter(t => {
+                      if (t.requiresBackend && !projectConfig.needsBackend) return false;
+                      if (t.requiresDatabase && !projectConfig.needsDatabase) return false;
+                      return true;
+                    });
+
+                  if (technologies.length === 0) return null;
+
+                  return (
+                    <div key={category}>
+                      <h4 className="text-sm font-medium text-gray-700 capitalize mb-2">
+                        {category} Technologies
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {technologies.map(tech => (
+                          <button
+                            key={tech.id}
+                            onClick={() => addPresetOption('techStack', tech.name)}
+                            className="text-left p-3 rounded-lg border border-gray-200 hover:border-indigo-500 hover:bg-indigo-50 transition-colors"
+                          >
+                            <div className="font-medium text-gray-900">{tech.name}</div>
+                            <div className="text-sm text-gray-500">{tech.description}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -203,7 +304,7 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
         <div className="border rounded-lg overflow-hidden">
           <div className="bg-gray-50 px-4 py-3 border-b">
             <div>
-              <h3 className="text-sm font-medium text-gray-700">User Stories Generator</h3>
+              <h3 className="text-sm font-medium text-gray-900">User Stories Generator</h3>
               <p className="text-xs text-gray-500 mt-1">
                 Use this prompt to generate user stories based on your features
               </p>
@@ -228,7 +329,7 @@ Please format them as "As a [user], I want to [action] so that [benefit]." and i
         <div className="border rounded-lg overflow-hidden">
           <div className="bg-gray-50 px-4 py-3 border-b">
             <div>
-              <h3 className="text-sm font-medium text-gray-700">User Stories</h3>
+              <h3 className="text-sm font-medium text-gray-900">User Stories</h3>
               <p className="text-xs text-gray-500 mt-1">
                 Add the generated user stories here
               </p>
