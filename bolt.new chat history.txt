@@ -1,0 +1,594 @@
+Interactive Prompt Generator App
+
+ADC>
+prompt-guide.md
+Using the attached example prompt guide in developing a task management app, make this an interactive general template to create any app.
+
+The app should:
+
+1. Organize prompts into logical development phases and sub-phases (as outlined in the attached example). 2. Provide a tabbed interface for each phase with expandable/collapsible UI for the sub-phases 3. Show clear instructions for customizing the prompts 1. Provide form inputs for all customizable elements (text, dropdowns, multiple input fields for lists (features, pages, etc.) 2. Use a clean, professional design with Tailwind CSS 3. Include copy-to-clipboard functionality for each prompt
+
+Bolt>
+I'll create an interactive prompt generator that helps users customize and create development guides for any type of application.
+
+Interactive Prompt Generator App
+
+npm install
+src/App.tsx
+src/components/PhaseTab.tsx
+src/components/ProjectForm.tsx
+src/data/phases.ts
+npm run dev
+I've created an interactive prompt generator that helps users create development guides for any type of application. The app features:
+
+A clean, professional interface with a gradient background and modern UI components
+A form to input project details:
+Project name
+Description
+Features (dynamic list)
+Tech stack (dynamic list)
+Tabbed interface for different development phases
+Expandable/collapsible sub-phases
+Copy-to-clipboard functionality for each prompt
+Dynamic prompt generation based on user input
+The prompts are organized into four main phases:
+
+Project Definition
+Frontend Development
+Backend Development
+Testing & Deployment
+Each phase contains relevant sub-phases with customizable prompts that automatically incorporate the user's project details.
+
+The development server is now running and you can see the interactive interface.
+
+
+Rollback to Checkpoint
+
+ADC>
+Add predefined list of tech stacks and other options complete with short description and uses that users can select. The user should still be able to add other items not listed.
+
+Bolt>
+I'll add predefined options with descriptions that users can select from, while maintaining the ability to add custom entries.
+
+Add predefined tech stack options
+
+src/data/presets.ts
+src/components/PresetSelector.tsx
+src/components/ProjectForm.tsx
+I've enhanced the form with:
+
+Predefined tech stack options organized by categories:
+
+Frontend Frameworks (React, Next.js, Vue.js)
+CSS Frameworks and UI Libraries
+Backend Technologies
+Databases
+State Management Solutions
+Common feature presets grouped by:
+
+Authentication
+Data Management
+User Interface
+Performance
+A new PresetSelector component that displays options in a grid with:
+
+Category grouping
+Labels and descriptions
+Interactive buttons
+Toggle buttons to show/hide preset options
+
+Improved UI with:
+
+Better spacing and organization
+Icons for actions
+Hover effects
+Clear categorization
+Users can still add custom entries while having quick access to common options. The presets help guide users toward best practices while maintaining flexibility.
+
+ADC>
+When adding new Features and Tech Stack entries, the elements below is slowly going out of the viewport. Update the UI so that the height of the elements should not change much. Perhaps you can change the layout so that the features and tech stack (and other future list) are on one side, and the phases are on the other side of the screen. Do what will improve the UI/UX.
+
+Bolt>
+I'll update the layout to create a two-column design for better space utilization and user experience.
+
+Improve layout with two-column design
+
+src/App.tsx
+src/components/ProjectForm.tsx
+Key improvements made:
+
+Split the layout into two columns:
+
+Left: Project details form
+Right: Phases and prompts
+Added scrollable containers:
+
+Phase content has max-h-[calc(100vh-20rem)] with overflow-y-auto
+Horizontal scrolling for phase tabs on mobile
+Improved form organization:
+
+Features and Tech Stack sections are now in contained cards
+Better visual hierarchy with section headers
+Cleaner preset selector integration
+Responsive design:
+
+Single column on mobile (lg:grid-cols-2)
+Proper spacing and gaps between elements
+Horizontal scrolling for phase tabs when needed
+Visual improvements:
+
+Consistent card styling
+Better spacing and padding
+Clearer visual hierarchy
+The layout now maintains a consistent height and provides a better user experience across all screen sizes.
+
+ADC>
+Remove the scrollable containers. Instead, change the Phase layout to be a collapsible/expandable section (like sub-phases) and move the sub-phases within the main phase. Making it a nested collapse/expand sections.
+
+Bolt>
+I'll update the layout to use nested collapsible sections for both phases and sub-phases.
+
+Update layout to nested collapsible sections
+
+src/App.tsx
+src/components/PhaseAccordion.tsx
+
+ADC>
+Currently, the user stories prompt is not used anywhere. I think it must be fed into the prompt generator since it will affect other parts of the system and therefore the resulting prompts. Incorporate a way to input the generated user stories. Perhaps below the tech stack or somewhere appropriate. Make sure to clearly describe how to use it and when.
+
+Bolt>
+I'll add a user stories section to the ProjectForm component and update the prompt formatting to include them.
+
+Add user stories input section
+
+src/components/ProjectForm.tsx
+src/App.tsx
+src/components/PhaseAccordion.tsx
+src/data/phases.ts
+I've made the following changes:
+
+Added a User Stories section to the ProjectForm component with:
+
+A textarea for each story entry
+Add/remove functionality like features and tech stack
+Helper text explaining when to add stories
+Updated the state in App.tsx to include userStories array
+
+Modified the PhaseAccordion component to:
+
+Accept userStories in projectDetails
+Include [USER_STORIES] replacement in formatPrompt
+Updated the phases.ts prompts to incorporate user stories where relevant:
+
+Added user stories context to technical requirements
+Included user stories in frontend component planning
+Referenced user stories in API design and testing
+Added user stories to documentation requirements
+The workflow is now:
+
+Define initial project details and features
+Use the "User Stories" phase to generate stories
+Add the generated stories to the User Stories section
+Continue with other phases, which will now include the user stories context
+
+ADC>
+Awesome. Now, update the overall layout of the app. Make it like a wizard with next/back buttons, but allow for easy navigation to any phase/step. Also add conditionals so that the user can decide to not use a backend for example, if the app is a simple static website, etc.. The final output should then be a nicely formatted prompts for each phase/sub phase expanded (single accordion) by default. The user should still be able to copy each prompt individually.
+
+Bolt>
+I'll help restructure the app into a wizard-like flow with conditional paths. Let's break this into smaller components and update the layout.
+
+Update layout to wizard flow
+
+src/App.tsx
+src/components/ProjectTypeSelector.tsx
+src/components/WizardNavigation.tsx
+src/components/PhaseAccordion.tsx
+I've updated the app to include:
+
+A wizard-like flow with two main steps:
+
+Project Type Selection
+Project Details
+Project Type selector with options:
+
+Static Website
+Full Stack Application
+Backend Service
+Mobile Application
+Conditional options based on project type:
+
+Authentication requirement
+Database requirement
+Backend requirement
+A progress indicator showing the current step
+
+Navigation controls:
+
+Next/Back buttons
+Ability to click on steps directly
+Final output view:
+
+All phases expanded by default
+Filtered phases based on project type
+Project type context added to prompts
+Individual copy buttons for each prompt
+Option to go back and edit
+The UI is now more guided and contextual, helping users make appropriate choices for their project type while maintaining the flexibility to navigate freely.
+
+ADC>
+Move the User Stories prompt generation above the User Stories entry section. Of course, the user stories prompt generator should still capture the needed info like features and should be referenced by other phases as before.
+
+Bolt>
+I'll update the ProjectForm component to show the user stories prompt before the input section, making it easier for users to generate and then input their user stories.
+
+Update User Stories Section
+
+src/components/ProjectForm.tsx
+I've made the following changes:
+
+Added a new "User Stories Generator" section above the user stories input section
+The generator shows a formatted prompt based on the project name and features
+Added a copy button to easily copy the prompt
+Updated the user stories input section description to clarify that it's for adding the generated stories
+The prompt updates dynamically as features are added or modified
+Maintained all existing functionality while improving the user flow
+The user can now:
+
+Add project details and features
+Copy the generated user stories prompt
+Use it to generate stories (e.g., with ChatGPT)
+Paste the generated stories back into the input section
+This creates a more logical flow while maintaining the connection between features and user stories throughout the application.
+
+ADC>
+Improve the UI/CSS of the WizardNavigation component because the title overlaps with the check icon.
+
+Bolt>
+I'll update the WizardNavigation component to improve the spacing and prevent title overlap.
+
+Update WizardNavigation component
+
+src/components/WizardNavigation.tsx
+Key improvements made:
+
+Added vertical spacing with py-8 to the nav container
+Centered the navigation with justify-center
+Used flex column layout for each step
+Increased spacing between step number and title with mt-4
+Added whitespace-nowrap to prevent title wrapping
+Improved hover states for step buttons
+Fixed the line position with top-4
+Added proper ARIA attributes for accessibility
+Added transition effect for color changes
+Improved group structure for better organization
+The navigation now has better spacing and the titles won't overlap with the step indicators.
+
+
+ADC>
+Add a 3rd step titled "Project Prompts" and keep the navigation component above.
+
+Bolt>
+I'll add a third step for "Project Prompts" while maintaining the navigation at the top.
+
+Add Project Prompts step
+
+src/App.tsx
+I've made the following changes:
+
+Added a third step titled "Project Prompts"
+Removed the separate final prompts view and integrated it into the wizard steps
+Kept the navigation component at the top
+Only show the "Next" button when not on the last step
+Maintained the ability to navigate between steps using the wizard navigation
+Added a title and description for the prompts step
+Kept the filtering of backend phases based on project configuration
+Expanded all prompts by default in the final step
+The wizard now flows through three clear steps:
+
+Project Type - Select the type of project and its requirements
+Project Details - Enter project information, features, and tech stack
+Project Prompts - View and copy the generated development guide prompts
+
+===========================
+ADC: Created a GitHub Repository: https://github.com/mamertofabian/app-prompt-builder
+===========================
+
+Bolt>
+I'm importing your repository into Bolt. This may take a moment as I set everything up. Once it's ready, you'll be able to explore and interact with your code.
+
+Importing Github Repository
+
+mamertofabian/app-prompt-builder
+I've successfully imported your project. I'm ready to assist you with analyzing and improving your code.
+
+Mamertofabian - App Prompt Builder
+
+npm install
+npm run dev
+
+Rollback to Checkpoint
+
+ADC>
+Update the title and subtitle of the app to properly reflect what the app do: Generate prompts to help generate apps. Or according to what you see in the code. Then update the README.md
+
+Bolt>
+I'll update the title and description to better reflect the app's purpose as an interactive development guide generator.
+
+Update app title and documentation
+
+index.html
+README.md
+I've updated both the HTML title and README.md to better reflect the application's purpose as a development guide generator. The title now clearly indicates it's a tool for generating development guides, and the README provides a comprehensive overview of the application's features and capabilities.
+
+
+Rollback to Checkpoint
+
+ADC>
+Also update what's in the App.tsx as well for consistency.
+
+Bolt>
+I'll update the header text in App.tsx to match the new title and maintain consistency across the application.
+
+Update App.tsx header
+
+src/App.tsx
+I've updated the header in App.tsx to use "DevGuide Generator" as the main title and added a more descriptive subtitle that aligns with the application's purpose. The changes maintain consistency with the HTML title and README.md while keeping the interface clean and professional.
+
+
+Rollback to Checkpoint
+
+ADC>
+Update the whole app so that it is more easy to use even for non-developers. Make sure there is a more cohesive and default structure to project types. Possibly some kind of schema or blueprint for each project types that defines the usual requirements for each type. For example, a static website only has static files (html, css, js, assets), while a full stack app can have a backend counterpart.
+This "schema" or "blueprint" will then be used as a guide in the overall app. This will also make it easier to add more project types in the future. For example, a Chrome extension.
+
+Bolt>
+I'll help restructure the app to be more user-friendly and add project type blueprints. Let's start by creating a new data structure for project blueprints and updating the relevant components.
+
+Add project blueprints and update components
+
+src/data/projectBlueprints.ts
+src/components/ProjectTypeSelector.tsx
+src/components/ProjectForm.tsx
+src/App.tsx
+I've created a comprehensive project blueprint system that:
+
+Defines clear structures for different project types
+Provides default and suggested features based on project type
+Recommends appropriate tech stack based on project requirements
+Automatically adjusts available options based on selected configuration
+Groups features and tech stack by categories
+Includes detailed descriptions and requirements for each option
+The UI now:
+
+Shows more context about each project type
+Provides categorized presets for features and tech stack
+Automatically includes default features and tech stack
+Filters options based on project configuration
+Provides better guidance for non-technical users
+The system is also extensible - new project types can be easily added by updating the projectBlueprints object.
+
+Would you like me to continue with updating any other components or adding more project types to the blueprint system?
+
+
+Rollback to Checkpoint
+
+ADC>
+Please fix this error: [plugin:vite:react-babel] /home/project/src/components/ProjectForm.tsx: Unexpected token (357:20)
+360 |                   
+/home/project/src/components/ProjectForm.tsx:357:20
+355|                    <button
+356|                      onClick={() => removeListItem('userStories', index)}
+357|                                          className="p-2 text-gray-400 hover:text-red-500"
+|                      ^
+358|                    >
+359|                      
+
+Bolt>
+I'll fix the error in the ProjectForm.tsx file. The issue was caused by an incorrect merge of the diff. Here's the correct version:
+
+Fix ProjectForm syntax error
+
+src/components/ProjectForm.tsx
+I've fixed the syntax error in the ProjectForm component. The error was caused by an incorrect merge that introduced XML tags into the component's JSX. The file is now properly formatted and should work correctly.
+
+
+Rollback to Checkpoint
+
+ADC>
+Break down ProjectForm.tsx into smaller components to make it more manageable
+
+Bolt>
+I'll break down the ProjectForm component into smaller, more manageable components. Here's how we'll restructure it:
+
+Break down ProjectForm into smaller components
+
+src/components/forms/ProjectBasicInfo.tsx
+src/components/forms/ListEditor.tsx
+src/components/forms/PresetSection.tsx
+src/components/forms/FeatureSection.tsx
+src/components/forms/TechStackSection.tsx
+src/components/forms/UserStoriesSection.tsx
+src/components/ProjectForm.tsx
+I've broken down the ProjectForm component into several smaller, more focused components:
+
+ProjectBasicInfo: Handles the project name and description inputs
+ListEditor: A reusable component for managing lists of items (features, tech stack, user stories)
+PresetSection: A reusable component for displaying preset options in a grid
+FeatureSection: Manages the features section with presets and custom entries
+TechStackSection: Manages the tech stack section with presets and custom entries
+UserStoriesSection: Handles both the user stories generator and input
+Each component is now more focused and easier to maintain. The main ProjectForm component now just coordinates these components and manages the overall state.
+
+The code is now more modular and follows the single responsibility principle. Each component handles a specific part of the form, making it easier to:
+
+Understand the code
+Make changes
+Fix bugs
+Add new features
+Test individual components
+
+Rollback to Checkpoint
+
+ADC>
+The default features and tech stack are getting doubled and sometimes more every time I click on a project type or switching back and forth between step 1 and 2. It also does not clear the defaults when switching project types, it would just add the default on top of the previous items in there.
+
+Bolt>
+I'll fix the issue with duplicating features and tech stack. The problem is in the useEffect hook in ProjectForm.tsx. Let's modify it to properly handle defaults when switching project types:
+
+Fix duplicating default features and tech stack
+
+src/components/ProjectForm.tsx
+The changes made:
+
+Removed the spread operator when setting features and techStack, so it now replaces the arrays instead of adding to them
+Added dependencies to the useEffect hook to also trigger when backend/database requirements change
+Removed the filter for non-empty items since we're replacing the entire arrays
+Now when you switch project types or change backend/database requirements:
+
+The previous features and tech stack will be cleared
+Only the appropriate default items for the current project type will be shown
+No duplicates will be created
+The defaults will update properly when toggling backend/database requirements
+
+Rollback to Checkpoint
+
+ADC>
+Update the project type card's style/css. The description and "includes" list is not properly laid out.
+
+Bolt>
+I'll update the styling of the project type cards to improve the layout and readability:
+
+Update project type card styling
+
+src/components/ProjectTypeSelector.tsx
+Key improvements made:
+
+Added proper height control with h-full to ensure consistent card heights
+Improved spacing with mb-4 between header and features section
+Added a visual separator with border-t between sections
+Improved feature list styling:
+Added bullet points using small colored circles
+Better alignment with flex items-center
+Consistent text sizes and colors
+Improved spacing between items
+Made the "Required" labels more subtle with smaller text and lighter color
+Added truncate and line-clamp-2 to prevent text overflow
+Improved header section with min-w-0 to handle long text properly
+Made the layout more structured with distinct header and features sections
+Added uppercase tracking for the "Includes" label
+Improved hover and selected states
+The cards now have a more professional and organized layout with better visual hierarchy and spacing.
+
+=======================
+RELOADED PROJECT IN BOLT TO RESET CHAT HISTORY
+=======================
+
+I'm importing your StackBlitz project into Bolt. This may take a moment as I set everything up. Once it's ready, you'll be able to explore and interact with your code.
+
+Importing Stackblitz Project
+
+github-xmt79s
+I've successfully imported your project. I'm ready to assist you with analyzing and improving your code.
+
+Mamertofabian - App Prompt Builder
+
+npm install
+npm run dev
+
+Rollback to Checkpoint
+
+ADC>
+If the user added items in the features and tech stack manually, and switch to step 1 or 3 and back to step 2, only the default items are there. The user-added items are gone. Fix this issue so that the default items will still be there (but will change depending on project type) and the user-entered items are retained.
+
+Bolt>
+I'll help fix the issue with preserving user-entered items while still applying defaults when the project type changes. The problem is in the ProjectForm component where the useEffect hook is overwriting all features and tech stack items instead of just adding missing defaults.
+
+Preserve user items while applying defaults
+
+src/components/ProjectForm.tsx
+The key changes made:
+
+Modified the useEffect hook to preserve existing user-entered items while adding new defaults
+Used Set to ensure uniqueness and prevent duplicates
+Filtered out empty strings before merging to avoid blank entries
+Maintained the existing items while adding new default ones based on project type changes
+Now when users switch between steps:
+
+User-entered items will be preserved
+Default items will still be added based on project type
+No duplicates will be created
+Empty entries are handled properly
+The development server is already running, so you can test the changes.
+
+
+Rollback to Checkpoint
+
+ADC>
+Can we strengthen this so that the user-entered items as well as default items are saved per project type in local storage. Then restore the items if the user switches back to that project type? Do the same for User Stories.
+
+Bolt>
+I'll help implement local storage to save and restore items per project type. We'll create a custom hook to handle this storage and retrieval functionality.
+
+Implement per-project type storage
+
+src/hooks/useProjectTypeStorage.ts
+src/components/ProjectForm.tsx
+Key changes made:
+
+Created a new custom hook useProjectTypeStorage to handle:
+
+Saving data to localStorage per project type
+Loading data when project type changes
+Error handling for storage operations
+Updated ProjectForm to:
+
+Use the new storage hook
+Merge stored data with defaults when loading
+Save changes automatically when data updates
+Handle cases where no stored data exists
+Preserve user stories across project type switches
+Enhanced the storage logic to:
+
+Store features, tech stack, and user stories separately per project type
+Merge default items with stored items when switching project types
+Handle empty states and initialization
+Now when users:
+
+Switch between project types, their entries are preserved
+Return to a previous project type, their data is restored
+Add custom items, they're saved automatically
+Change project types, default items are still applied
+The development server is already running, so you can test these changes.
+
+Bolt has resolved the problem.
+
+3
+Show problem
+
+Bolt>
+I'll fix the infinite update loop in the ProjectForm component by adjusting the useEffect dependencies and storage logic.
+
+Fix infinite update loop in ProjectForm
+
+src/hooks/useProjectTypeStorage.ts
+src/components/ProjectForm.tsx
+Key changes to fix the infinite update loop:
+
+Added an isInitialLoad state to control when data should be loaded from storage
+Modified useProjectTypeStorage hook to:
+Accept a shouldLoadDefaults parameter
+Only load data when explicitly requested
+Only save data when not in loading phase
+Updated the initialization effect to:
+Set isInitialLoad to true before loading
+Set it to false after loading is complete
+Handle JSON parsing errors gracefully
+Separated the storage loading and saving logic to prevent circular updates
+These changes ensure that:
+
+Data is only loaded when the project type or configuration changes
+Storage operations don't trigger unnecessary re-renders
+The component maintains proper state management
+User data is preserved correctly across project type switches
+Default items are properly merged with user data
+The development server is already running, so you can test these changes.
