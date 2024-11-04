@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { projectBlueprints } from '../data/projectBlueprints';
 import type { ProjectType } from '../App';
 import ProjectBasicInfo from './forms/ProjectBasicInfo';
 import FeatureSection from './forms/FeatureSection';
 import TechStackSection from './forms/TechStackSection';
 import UserStoriesSection from './forms/UserStoriesSection';
+import { useProjectTypeStorage } from '../hooks/useProjectTypeStorage';
 
 interface ProjectFormProps {
   projectDetails: {
@@ -31,9 +32,29 @@ interface ProjectFormProps {
 
 function ProjectForm({ projectDetails, setProjectDetails, projectConfig }: ProjectFormProps) {
   const blueprint = projectBlueprints[projectConfig.type];
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Use the storage hook to handle per-project type data persistence
+  useProjectTypeStorage(
+    projectConfig.type,
+    {
+      features: projectDetails.features,
+      techStack: projectDetails.techStack,
+      userStories: projectDetails.userStories
+    },
+    (storedData) => {
+      setProjectDetails(prev => ({
+        ...prev,
+        ...storedData
+      }));
+    },
+    isInitialLoad
+  );
 
   // Initialize with default features and tech stack when project type changes
   useEffect(() => {
+    setIsInitialLoad(true);
+
     const defaultFeatures = blueprint.defaultFeatures
       .filter(f => f.isDefault)
       .filter(f => {
@@ -52,11 +73,40 @@ function ProjectForm({ projectDetails, setProjectDetails, projectConfig }: Proje
       })
       .map(t => t.name);
 
-    setProjectDetails(prev => ({
-      ...prev,
-      features: defaultFeatures,
-      techStack: defaultTechStack
-    }));
+    // Try to load stored data for this project type
+    const storageKey = `project_type_${projectConfig.type}`;
+    const storedData = localStorage.getItem(storageKey);
+
+    if (!storedData) {
+      // If no stored data exists, apply defaults
+      setProjectDetails(prev => ({
+        ...prev,
+        features: [...new Set([...defaultFeatures])],
+        techStack: [...new Set([...defaultTechStack])],
+        userStories: []
+      }));
+    } else {
+      // If stored data exists, merge with defaults
+      try {
+        const parsedData = JSON.parse(storedData);
+        setProjectDetails(prev => ({
+          ...prev,
+          features: [...new Set([...parsedData.features, ...defaultFeatures])],
+          techStack: [...new Set([...parsedData.techStack, ...defaultTechStack])],
+          userStories: parsedData.userStories || []
+        }));
+      } catch (error) {
+        console.error('Failed to parse stored data:', error);
+        setProjectDetails(prev => ({
+          ...prev,
+          features: [...new Set([...defaultFeatures])],
+          techStack: [...new Set([...defaultTechStack])],
+          userStories: []
+        }));
+      }
+    }
+
+    setIsInitialLoad(false);
   }, [projectConfig.type, projectConfig.needsBackend, projectConfig.needsDatabase]);
 
   return (
