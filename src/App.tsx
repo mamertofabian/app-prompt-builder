@@ -101,8 +101,8 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
       <header className="bg-white shadow-sm border-b border-indigo-100">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">Interactive Development Guide Generator</h1>
-          <p className="mt-2 text-gray-600">Create customized development guides for any application</p>
+          <h1 className="text-3xl font-bold text-gray-900">DevGuide Generator</h1>
+          <p className="mt-2 text-gray-600">Create structured development guides and prompts for your projects</p>
         </div>
       </header>
 
