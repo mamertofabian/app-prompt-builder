@@ -1,4 +1,4 @@
-# AIPromptArchitect
+# AIPromptArchitect (APArch)
 
 An interactive tool that helps developers create comprehensive development guides and prompts for their projects. This application streamlines the process of planning and documenting software projects by generating structured prompts for different development phases.
 
@@ -20,4 +20,4 @@ The tool generates prompts for various development phases:
 - Backend Development (when applicable)
 - Testing & Deployment
 
-[Edit in StackBlitz ⚡️](https://stackblitz.com/~/github.com/mamertofabian/app-prompt-builder)
+[Edit in StackBlitz ⚡️](https://stackblitz.com/~/github.com/mamertofabian/ai-prompt-architect)
