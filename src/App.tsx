@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { phases } from './data/phases';
-import ProjectForm from './components/ProjectForm';
-import WizardNavigation from './components/WizardNavigation';
-import PhaseAccordion from './components/PhaseAccordion';
-import ProjectTypeSelector from './components/ProjectTypeSelector';
-import GuidelinesSection from './components/GuidelinesSection';
-import StoryDrivenPrompts from './components/StoryDrivenPrompts';
-import { projectBlueprints } from './data/projectBlueprints';
+import React, { useState } from "react";
+import { phases } from "./data/phases";
+import ProjectForm from "./components/ProjectForm";
+import WizardNavigation from "./components/WizardNavigation";
+import PhaseAccordion from "./components/PhaseAccordion";
+import ProjectTypeSelector from "./components/ProjectTypeSelector";
+import GuidelinesSection from "./components/GuidelinesSection";
+import StoryDrivenPrompts from "./components/StoryDrivenPrompts";
+import { projectBlueprints } from "./data/projectBlueprints";
 
 export type ProjectType = keyof typeof projectBlueprints;
 
@@ -20,18 +20,18 @@ interface ProjectConfig {
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [projectConfig, setProjectConfig] = useState<ProjectConfig>({
-    type: 'static',
+    type: "static",
     needsBackend: false,
     needsDatabase: false,
     needsAuthentication: false,
   });
 
   const [projectDetails, setProjectDetails] = useState({
-    name: '',
-    description: '',
-    features: [''],
-    techStack: [''],
-    userStories: [''],
+    name: "",
+    description: "",
+    features: [""],
+    techStack: [""],
+    userStories: [""],
   });
 
   const copyToClipboard = (text: string) => {
@@ -41,35 +41,41 @@ function App() {
   const steps = [
     {
       title: "Project Type",
-      component: <ProjectTypeSelector 
-        projectConfig={projectConfig}
-        setProjectConfig={setProjectConfig}
-      />
+      component: (
+        <ProjectTypeSelector
+          projectConfig={projectConfig}
+          setProjectConfig={setProjectConfig}
+        />
+      ),
     },
     {
       title: "Project Details",
-      component: <ProjectForm 
-        projectDetails={projectDetails}
-        setProjectDetails={setProjectDetails}
-        projectConfig={projectConfig}
-      />
+      component: (
+        <ProjectForm
+          projectDetails={projectDetails}
+          setProjectDetails={setProjectDetails}
+          projectConfig={projectConfig}
+        />
+      ),
     },
     {
       title: "Development Guide",
       component: (
         <div className="space-y-8">
           <GuidelinesSection />
-          
+
           <div className="space-y-6">
             <div>
-              <h2 className="text-lg font-medium text-gray-900">Project Setup & Structure</h2>
+              <h2 className="text-lg font-medium text-gray-900">
+                Project Setup & Structure
+              </h2>
               <p className="mt-1 text-sm text-gray-500">
                 Initial project setup and architecture guidelines
               </p>
             </div>
-            
-            <PhaseAccordion 
-              phases={phases.filter(phase => {
+
+            <PhaseAccordion
+              phases={phases.filter((phase) => {
                 if (phase.title === "Project Definition") return true;
                 if (phase.title === "Backend Development") {
                   return projectConfig.needsBackend;
@@ -85,13 +91,15 @@ function App() {
 
           <div className="space-y-6">
             <div>
-              <h2 className="text-lg font-medium text-gray-900">Story-Driven Development</h2>
+              <h2 className="text-lg font-medium text-gray-900">
+                Story-Driven Development
+              </h2>
               <p className="mt-1 text-sm text-gray-500">
                 Select a user story to get phase-specific development prompts
               </p>
             </div>
-            
-            <StoryDrivenPrompts 
+
+            <StoryDrivenPrompts
               projectDetails={projectDetails}
               projectConfig={projectConfig}
             />
@@ -99,15 +107,21 @@ function App() {
 
           <div className="space-y-6">
             <div>
-              <h2 className="text-lg font-medium text-gray-900">Deployment & Operations</h2>
+              <h2 className="text-lg font-medium text-gray-900">
+                Deployment & Operations
+              </h2>
               <p className="mt-1 text-sm text-gray-500">
                 Guidelines for deploying and maintaining your application
               </p>
             </div>
-            
-            <PhaseAccordion 
-              phases={phases.filter(phase => {
-                if (phase.title === "Testing & Deployment" || phase.title === "Debugging & Optimization") return true;
+
+            <PhaseAccordion
+              phases={phases.filter((phase) => {
+                if (
+                  phase.title === "Testing & Deployment" ||
+                  phase.title === "Debugging & Optimization"
+                )
+                  return true;
                 return false;
               })}
               projectDetails={projectDetails}
@@ -117,19 +131,19 @@ function App() {
             />
           </div>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
@@ -141,19 +155,23 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
       <header className="bg-white shadow-sm border-b border-indigo-100">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">DevGuide Generator</h1>
-          <p className="mt-2 text-gray-600">Create structured development guides and prompts for your projects</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            AI Prompt Architect
+          </h1>
+          <p className="mt-2 text-gray-600">
+            Create structured development guides and prompts for your projects
+          </p>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="space-y-8">
-          <WizardNavigation 
+          <WizardNavigation
             steps={steps}
             currentStep={currentStep}
             onStepClick={handleStepClick}
           />
-          
+
           <div className="bg-white rounded-xl shadow-lg p-6">
             {steps[currentStep].component}
           </div>
@@ -163,9 +181,9 @@ function App() {
               onClick={handleBack}
               disabled={currentStep === 0}
               className={`px-4 py-2 rounded-md ${
-                currentStep === 0 
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
+                currentStep === 0
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white text-gray-600 hover:bg-gray-50"
               }`}
             >
               Back
