@@ -1,4 +1,4 @@
-# DevGuide Generator
+# AIPromptArchitect
 
 An interactive tool that helps developers create comprehensive development guides and prompts for their projects. This application streamlines the process of planning and documenting software projects by generating structured prompts for different development phases.
 
