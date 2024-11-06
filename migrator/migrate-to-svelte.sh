@@ -21,10 +21,11 @@ migrate_component() {
     6. Convert any React Context usage to Svelte stores
     7. Ensure TypeScript types are properly handled
     8. Convert any CSS-in-JS to Svelte style tags
-    Please place the component in $target_dir/$component_name.svelte"
+    Please place the component in $target_dir/$component_name.svelte
+    DO NOT DELETE or try to fix the old React file"
     
     # Execute the migration using aider
-    aider --message "$aider_command" "$component"
+    aider --message "$aider_command" --read "$component"
 }
 
 # Create src/lib directory if it doesn't exist
