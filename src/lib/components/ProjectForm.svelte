@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { projectBlueprints } from '../data/projectBlueprints';
-  import type { ProjectType } from '../App';
-  import ProjectBasicInfo from './forms/ProjectBasicInfo.svelte';
-  import FeatureSection from './forms/FeatureSection.svelte';
-  import TechStackSection from './forms/TechStackSection.svelte';
-  import UserStoriesSection from './forms/UserStoriesSection.svelte';
+  import { projectBlueprints } from '../../data/projectBlueprints';
+  import ProjectType from '../App.svelte';
+  import ProjectBasicInfo from './ProjectBasicInfo.svelte';
+  import FeatureSection from './FeatureSection.svelte';
+  import TechStackSection from './TechStackSection.svelte';
+  import UserStoriesSection from './UserStoriesSection.svelte';
 
   // Props
   export let projectDetails: {

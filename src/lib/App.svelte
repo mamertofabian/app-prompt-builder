@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { phases } from "../data/phases";
-  import ProjectForm from "../components/ProjectForm.svelte";
-  import WizardNavigation from "../components/WizardNavigation.svelte";
-  import PhaseAccordion from "../components/PhaseAccordion.svelte";
-  import ProjectTypeSelector from "../components/ProjectTypeSelector.svelte";
-  import GuidelinesSection from "../components/GuidelinesSection.svelte";
-  import StoryDrivenPrompts from "../components/StoryDrivenPrompts.svelte";
+  import ProjectForm from "./components/ProjectForm.svelte";
+  import WizardNavigation from "./components/WizardNavigation.svelte";
+  import PhaseAccordion from "./components/PhaseAccordion.svelte";
+  import ProjectTypeSelector from "./components/ProjectTypeSelector.svelte";
+  import GuidelinesSection from "./components/GuidelinesSection.svelte";
+  import StoryDrivenPrompts from "./components/StoryDrivenPrompts.svelte";
   import { projectBlueprints } from "../data/projectBlueprints";
 
   type ProjectType = keyof typeof projectBlueprints;
