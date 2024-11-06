@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ProjectType } from '../App';
+  import type { ProjectType } from '../../data/projectBlueprints';
   import { projectBlueprints } from '../data/projectBlueprints';
 
   export let projectConfig: {
