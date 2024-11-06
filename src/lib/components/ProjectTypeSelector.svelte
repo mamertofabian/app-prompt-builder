@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ProjectType } from '../../data/projectBlueprints';
-  import { projectBlueprints } from '../data/projectBlueprints';
+  import { projectBlueprints } from '../../data/projectBlueprints';
 
   export let projectConfig: {
     type: ProjectType;
@@ -35,7 +35,7 @@
     {#each Object.values(projectBlueprints) as blueprint}
       {@const Icon = blueprint.icon}
       <button
-        on:click={() => handleTypeSelect(blueprint.type as ProjectType)}
+        on:click={() => handleTypeSelect(blueprint.type)}
         class="relative rounded-lg border p-4 flex flex-col h-full text-left"
         class:border-indigo-600={projectConfig.type === blueprint.type}
         class:ring-2={projectConfig.type === blueprint.type}
