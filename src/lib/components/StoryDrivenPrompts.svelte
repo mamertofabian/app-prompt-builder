@@ -2,10 +2,10 @@
   import type { UserStory, ProjectType } from '../storyDrivenTypes';
   import { developmentPhases } from '../storyDrivenTypes';
   import UserStoryEditor from './UserStoryEditor.svelte';
-  import NoStoriesPlaceholder from './prompts/NoStoriesPlaceholder.svelte';
-  import PhasesList from './prompts/PhasesList.svelte';
-  import StoryDetails from './prompts/StoryDetails.svelte';
-  import StorySelector from './prompts/StorySelector.svelte';
+  import NoStoriesPlaceholder from './NoStoriesPlaceholder.svelte';
+  import PhasesList from './PhasesList.svelte';
+  import StoryDetails from './StoryDetails.svelte';
+  import StorySelector from './StorySelector.svelte';
 
   export let projectDetails: {
     name: string;
