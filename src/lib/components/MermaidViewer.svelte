@@ -13,14 +13,24 @@
     theme: darkMode ? 'dark' : 'default',
     securityLevel: 'loose',
     fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+    flowchart: {
+      htmlLabels: true,
+      curve: 'basis',
+      defaultRenderer: 'dagre-d3'
+    }
   });
 
   async function renderDiagram() {
     if (!diagram) return;
     
     try {
+      // Validate diagram syntax first
+      await mermaid.parse(diagram);
+      
       const { svg } = await mermaid.render('diagram', diagram);
-      container.innerHTML = svg;
+      if (container) {
+        container.innerHTML = svg;
+      }
       error = null;
     } catch (e) {
       error = 'Failed to render diagram. Please check the Mermaid syntax.';
@@ -32,8 +42,8 @@
     renderDiagram();
   }
 
-  $: if (darkMode) {
-    mermaid.initialize({ theme: 'dark' });
+  $: if (darkMode !== undefined) {
+    mermaid.initialize({ theme: darkMode ? 'dark' : 'default' });
     renderDiagram();
   }
 

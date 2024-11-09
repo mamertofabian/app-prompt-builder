@@ -18,17 +18,48 @@
     generated: string;
   }>();
 
+  const mermaidInstructions = `
+Important: Follow these Mermaid diagram rules:
+1. Always start with a valid declaration:
+   flowchart TD or graph TD
+2. Use proper node syntax:
+   A[Node text] --> B[Another node]
+3. Escape special characters in node text
+4. Keep node IDs simple and unique
+5. Use proper arrow syntax: -->, ---, -.->, ==>, etc.
+6. Add line breaks with <br> in node text
+
+Example:
+flowchart TD
+    A[Start] --> B[Process]
+    B --> C[End]
+    style A fill:#f9f,stroke:#333
+    style C fill:#bbf,stroke:#333
+`;
+
   async function generateDiagram() {
     isGenerating = true;
     generationError = null;
 
     try {
-      const result = await generateWithAI(prompt, systemPrompt);
-      // Extract Mermaid code from the response if it's wrapped in code blocks
-      diagram = result.replace(/```mermaid\n([\s\S]*?)```/g, '$1').trim();
+      const result = await generateWithAI(prompt, systemPrompt + mermaidInstructions);
+      
+      let diagramCode = result.replace(/```mermaid\n([\s\S]*?)```/g, '$1').trim();
+      
+      if (!diagramCode.match(/^(flowchart|graph)\s+TD/)) {
+        diagramCode = `flowchart TD\n${diagramCode}`;
+      }
+      
+      // Basic syntax validation
+      if (!diagramCode.includes('-->') && !diagramCode.includes('---')) {
+        throw new Error('Invalid diagram syntax: missing connections');
+      }
+      
+      diagram = diagramCode;
       dispatch('generated', diagram);
     } catch (error) {
-      generationError = 'Failed to generate diagram. Please try again.';
+      generationError = error instanceof Error ? error.message : 'Failed to generate diagram';
+      console.error('Generation error:', error);
     } finally {
       isGenerating = false;
     }

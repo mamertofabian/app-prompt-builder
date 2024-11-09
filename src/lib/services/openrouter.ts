@@ -25,25 +25,33 @@ export async function generateWithAI(prompt: string, systemPrompt?: string): Pro
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': siteUrl,
-        'X-Title': siteName,
+        'HTTP-Referer': siteUrl || 'http://localhost:5173',
+        'X-Title': siteName || 'DevGuide Generator',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-3.5-turbo',
-        messages
+        model: 'google/gemini-flash-1.5-exp',
+        messages,
+        temperature: 0.7,
+        max_tokens: 2000
       })
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to generate content');
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
     }
 
     const data: OpenRouterResponse = await response.json();
-    return data.choices[0]?.message?.content || '';
+    const content = data.choices[0]?.message?.content;
+    
+    if (!content) {
+      throw new Error('No content received from AI service');
+    }
+
+    return content;
   } catch (error) {
     console.error('AI generation error:', error);
-    throw new Error('Failed to generate content. Please check your API configuration.');
+    throw new Error(error instanceof Error ? error.message : 'Failed to generate content');
   }
 }
