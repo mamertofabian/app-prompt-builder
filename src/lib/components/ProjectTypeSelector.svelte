@@ -9,17 +9,18 @@
     needsAuthentication: boolean;
   };
 
-  export let setProjectConfig: (value: typeof projectConfig) => void;
+  export let onProjectConfigUpdate: (config: typeof projectConfig) => void;
 
   function handleTypeSelect(type: ProjectType) {
     const blueprint = projectBlueprints[type];
-    setProjectConfig({
+    const newConfig = {
       ...projectConfig,
       type,
       needsBackend: !!blueprint.structure.backend?.required,
       needsDatabase: !!blueprint.structure.database?.required,
       needsAuthentication: blueprint.defaultFeatures.some(f => f.id === 'auth' && f.isDefault),
-    });
+    };
+    onProjectConfigUpdate(newConfig);
   }
 </script>
 
@@ -105,7 +106,7 @@
             type="checkbox"
             id="backend"
             checked={projectConfig.needsBackend}
-            on:change={(e) => setProjectConfig({
+            on:change={(e) => onProjectConfigUpdate({
               ...projectConfig,
               needsBackend: e.currentTarget.checked,
               needsDatabase: e.currentTarget.checked && projectConfig.needsDatabase
@@ -124,7 +125,7 @@
             type="checkbox"
             id="database"
             checked={projectConfig.needsDatabase}
-            on:change={(e) => setProjectConfig({
+            on:change={(e) => onProjectConfigUpdate({
               ...projectConfig,
               needsDatabase: e.currentTarget.checked
             })}
@@ -142,7 +143,7 @@
             type="checkbox"
             id="authentication"
             checked={projectConfig.needsAuthentication}
-            on:change={(e) => setProjectConfig({
+            on:change={(e) => onProjectConfigUpdate({
               ...projectConfig,
               needsAuthentication: e.currentTarget.checked
             })}

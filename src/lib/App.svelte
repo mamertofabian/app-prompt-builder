@@ -11,16 +11,9 @@
 
   type ProjectType = keyof typeof projectBlueprints;
 
-  interface ProjectConfig {
-    type: ProjectType;
-    needsBackend: boolean;
-    needsDatabase: boolean;
-    needsAuthentication: boolean;
-  }
-
   let currentStep = 0;
-  let projectConfig: ProjectConfig = {
-    type: "static",
+  let projectConfig = {
+    type: "static" as ProjectType,
     needsBackend: false,
     needsDatabase: false,
     needsAuthentication: false,
@@ -34,8 +27,8 @@
     userStories: [""],
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
   };
 
   const steps = [
@@ -48,7 +41,7 @@
       component: ProjectForm,
     },
     {
-      title: "Development Guide",
+      title: "Project Prompts",
       component: "guide",
     },
   ];
@@ -67,6 +60,10 @@
 
   function handleStepClick(index: number) {
     currentStep = index;
+  }
+
+  function handleProjectConfigUpdate(newConfig: typeof projectConfig) {
+    projectConfig = newConfig;
   }
 
   $: filteredPhases = phases.filter((phase) => {
@@ -91,7 +88,7 @@
   <header class="bg-white shadow-sm border-b border-indigo-100">
     <div class="max-w-7xl mx-auto px-4 py-6">
       <h1 class="text-3xl font-bold text-gray-900">
-        AI Prompt Architect
+        DevGuide Generator
       </h1>
       <p class="mt-2 text-gray-600">
         Create structured development guides and prompts for your projects
@@ -111,6 +108,7 @@
         {#if currentStep === 0}
           <ProjectTypeSelector
             bind:projectConfig
+            onProjectConfigUpdate={handleProjectConfigUpdate}
           />
         {:else if currentStep === 1}
           <ProjectForm
