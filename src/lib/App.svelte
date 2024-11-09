@@ -176,7 +176,7 @@
           />
         {:else}
           <div class="space-y-8">
-            <GuidelinesSection />
+            <!-- <GuidelinesSection /> -->
             <StoryDrivenPrompts
               {projectDetails}
               {projectConfig}

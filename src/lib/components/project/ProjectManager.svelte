@@ -16,6 +16,7 @@
   let editingProject: Project | null = null;
   let deletingProject: Project | null = null;
   let formError: string | null = null;
+  let selectedProjectId: string | null = null;
 
   const dispatch = createEventDispatcher<{
     create: Project;
@@ -41,6 +42,35 @@
     showDeleteDialog = true;
   }
 
+  function handleProjectSelect(project: Project) {
+    selectedProjectId = project.id;
+    dispatch('select', project);
+  }
+
+  function getDefaultFeatures(type: string, needsBackend: boolean, needsDatabase: boolean) {
+    const blueprint = projectBlueprints[type];
+    return blueprint.defaultFeatures
+      .filter(f => f.isDefault)
+      .filter(f => {
+        if (f.requiresBackend && !needsBackend) return false;
+        if (f.requiresDatabase && !needsDatabase) return false;
+        return true;
+      })
+      .map(f => f.name);
+  }
+
+  function getDefaultTechStack(type: string, needsBackend: boolean, needsDatabase: boolean) {
+    const blueprint = projectBlueprints[type];
+    return blueprint.recommendedTechStack
+      .filter(t => t.isDefault)
+      .filter(t => {
+        if (t.requiresBackend && !needsBackend) return false;
+        if (t.requiresDatabase && !needsDatabase) return false;
+        return true;
+      })
+      .map(t => t.name);
+  }
+
   function handleFormSave(event: CustomEvent<{
     name: string;
     description: string;
@@ -61,33 +91,14 @@
       return;
     }
 
-    const blueprint = projectBlueprints[type];
-    const defaultFeatures = blueprint.defaultFeatures
-      .filter(f => f.isDefault)
-      .filter(f => {
-        if (f.requiresBackend && !needsBackend) return false;
-        if (f.requiresDatabase && !needsDatabase) return false;
-        return true;
-      })
-      .map(f => f.name);
-
-    const defaultTechStack = blueprint.recommendedTechStack
-      .filter(t => t.isDefault)
-      .filter(t => {
-        if (t.requiresBackend && !needsBackend) return false;
-        if (t.requiresDatabase && !needsDatabase) return false;
-        return true;
-      })
-      .map(t => t.name);
-
     if (showCreateForm) {
       const newProject: Project = {
         id: crypto.randomUUID(),
         name: name.trim(),
         description: description.trim(),
         type,
-        features: defaultFeatures,
-        techStack: defaultTechStack,
+        features: getDefaultFeatures(type, needsBackend, needsDatabase),
+        techStack: getDefaultTechStack(type, needsBackend, needsDatabase),
         userStories: [],
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -101,8 +112,9 @@
         name: name.trim(),
         description: description.trim(),
         type,
-        features: defaultFeatures,
-        techStack: defaultTechStack,
+        features: getDefaultFeatures(type, needsBackend, needsDatabase),
+        techStack: getDefaultTechStack(type, needsBackend, needsDatabase),
+        userStories: editingProject.userStories, // Preserve existing user stories
         updatedAt: new Date(),
       };
       dispatch('update', updatedProject);
@@ -114,13 +126,12 @@
   function handleDeleteConfirm() {
     if (deletingProject) {
       dispatch('delete', { id: deletingProject.id });
+      if (selectedProjectId === deletingProject.id) {
+        selectedProjectId = null;
+      }
       showDeleteDialog = false;
       deletingProject = null;
     }
-  }
-
-  function handleProjectClick(project: Project) {
-    dispatch('select', project);
   }
 </script>
 
@@ -128,9 +139,11 @@
   {projects}
   {loading}
   {error}
+  {selectedProjectId}
   onCreateClick={handleCreateClick}
   onEditClick={handleEditClick}
   onDeleteClick={handleDeleteClick}
+  onProjectSelect={handleProjectSelect}
   onRetry={() => dispatch('retry')}
 />
 

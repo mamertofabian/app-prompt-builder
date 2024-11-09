@@ -5,10 +5,12 @@
   export let projects: Project[] = [];
   export let loading = false;
   export let error: string | null = null;
+  export let selectedProjectId: string | null = null;
 
   export let onCreateClick: () => void;
   export let onEditClick: (project: Project) => void;
   export let onDeleteClick: (project: Project) => void;
+  export let onProjectSelect: (project: Project) => void;
   export let onRetry: () => void;
 
   function formatDate(date: Date): string {
@@ -70,7 +72,17 @@
   {:else}
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {#each projects as project (project.id)}
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div 
+          class="bg-white rounded-lg border cursor-pointer transition-all duration-200 {
+            selectedProjectId === project.id 
+              ? 'border-indigo-600 ring-2 ring-indigo-600 shadow-md' 
+              : 'border-gray-200 hover:border-indigo-300 hover:shadow-md'
+          }"
+          on:click={() => onProjectSelect(project)}
+          on:keydown={(e) => e.key === 'Enter' && onProjectSelect(project)}
+          role="button"
+          tabindex="0"
+        >
           <div class="p-6">
             <div class="flex justify-between items-start">
               <div>
@@ -79,14 +91,20 @@
               </div>
               <div class="flex space-x-2">
                 <button
-                  on:click={() => onEditClick(project)}
+                  on:click={(e) => {
+                    e.stopPropagation();
+                    onEditClick(project);
+                  }}
                   class="p-2 text-gray-400 hover:text-indigo-600"
                   title="Edit project"
                 >
                   <Edit2 class="h-5 w-5" />
                 </button>
                 <button
-                  on:click={() => onDeleteClick(project)}
+                  on:click={(e) => {
+                    e.stopPropagation();
+                    onDeleteClick(project);
+                  }}
                   class="p-2 text-gray-400 hover:text-red-600"
                   title="Delete project"
                 >

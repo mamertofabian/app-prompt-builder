@@ -34,25 +34,39 @@
     needsAuthentication: false,
   };
 
-  $: if (project) {
-    form = {
-      name: project.name,
-      description: project.description
-    };
-    projectConfig = {
-      type: project.type as ProjectType,
-      needsBackend: project.features.some(f => 
-        projectBlueprints[project.type].defaultFeatures.some(df => 
-          df.name === f && df.requiresBackend
-        )
-      ),
-      needsDatabase: project.features.some(f => 
-        projectBlueprints[project.type].defaultFeatures.some(df => 
-          df.name === f && df.requiresDatabase
-        )
-      ),
-      needsAuthentication: project.features.some(f => f.includes('authentication')),
-    };
+  $: if (show) {
+    if (project) {
+      form = {
+        name: project.name,
+        description: project.description
+      };
+      projectConfig = {
+        type: project.type as ProjectType,
+        needsBackend: project.features.some(f => 
+          projectBlueprints[project.type].defaultFeatures.some(df => 
+            df.name === f && df.requiresBackend
+          )
+        ),
+        needsDatabase: project.features.some(f => 
+          projectBlueprints[project.type].defaultFeatures.some(df => 
+            df.name === f && df.requiresDatabase
+          )
+        ),
+        needsAuthentication: project.features.some(f => f.includes('authentication')),
+      };
+    } else {
+      // Reset form for new project
+      form = {
+        name: '',
+        description: ''
+      };
+      projectConfig = {
+        type: 'static' as ProjectType,
+        needsBackend: false,
+        needsDatabase: false,
+        needsAuthentication: false,
+      };
+    }
   }
 
   function handleSubmit() {

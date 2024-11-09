@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { ChevronDown, ChevronRight, Copy, Plus, Edit, Trash2 } from 'lucide-svelte';
   import UserStoryForm from './UserStoryForm.svelte';
 
