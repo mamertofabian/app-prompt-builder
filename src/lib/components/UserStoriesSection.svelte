@@ -1,12 +1,15 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import { ChevronDown, ChevronRight, Copy, Plus, Edit } from 'lucide-svelte';
   import ListEditor from './ListEditor.svelte';
-  import { onMount } from 'svelte';
 
   export let projectName: string;
   export let features: string[];
   export let userStories: string[];
-  export let onUserStoriesChange: (stories: string[]) => void;
+
+  const dispatch = createEventDispatcher<{
+    userStoriesChange: string[];
+  }>();
 
   interface UserStory {
     title: string;
@@ -45,25 +48,31 @@
     }`;
   }
 
-  function addAcceptanceCriteria() {
-    editingStory = {
-      ...editingStory,
-      acceptanceCriteria: [...editingStory.acceptanceCriteria, '']
-    };
-  }
-
-  function removeAcceptanceCriteria(index: number) {
-    editingStory = {
-      ...editingStory,
-      acceptanceCriteria: editingStory.acceptanceCriteria.filter((_, i) => i !== index)
-    };
-  }
-
-  function updateAcceptanceCriteria(index: number, value: string) {
-    editingStory = {
-      ...editingStory,
-      acceptanceCriteria: editingStory.acceptanceCriteria.map((ac, i) => i === index ? value : ac)
-    };
+  function handleListChange(event: CustomEvent<{
+    type: 'add' | 'remove' | 'update';
+    index?: number;
+    value?: string;
+  }>) {
+    const { type, index, value } = event.detail;
+    
+    if (type === 'add') {
+      editingStory = {
+        ...editingStory,
+        acceptanceCriteria: [...editingStory.acceptanceCriteria, '']
+      };
+    } else if (type === 'remove' && typeof index === 'number') {
+      editingStory = {
+        ...editingStory,
+        acceptanceCriteria: editingStory.acceptanceCriteria.filter((_, i) => i !== index)
+      };
+    } else if (type === 'update' && typeof index === 'number' && value !== undefined) {
+      editingStory = {
+        ...editingStory,
+        acceptanceCriteria: editingStory.acceptanceCriteria.map((ac, i) => 
+          i === index ? value : ac
+        )
+      };
+    }
   }
 
   function handleEditStory(index: number) {
@@ -82,7 +91,7 @@
       updatedStories.push(formattedStory);
     }
     
-    onUserStoriesChange(updatedStories);
+    dispatch('userStoriesChange', updatedStories);
     isEditing = false;
     editingStory = { title: '', description: '', acceptanceCriteria: [''] };
     selectedStoryIndex = -1;
@@ -145,9 +154,7 @@ ${parsed.acceptanceCriteria.map(ac => `- ${ac}`).join('\n')}
           <div class="mt-2 space-y-2">
             <ListEditor
               items={editingStory.acceptanceCriteria}
-              {addAcceptanceCriteria}
-              {removeAcceptanceCriteria}
-              {updateAcceptanceCriteria}
+              on:listChange={handleListChange}
               placeholder="Given [context], when [action], then [result]"
             />
           </div>
@@ -224,7 +231,7 @@ ${parsed.acceptanceCriteria.map(ac => `- ${ac}`).join('\n')}
                   <div>
                     <h5 class="text-xs font-medium text-gray-700">Acceptance Criteria:</h5>
                     <ul class="mt-1 space-y-1">
-                      {#each parsed.acceptanceCriteria as ac, acIndex}
+                      {#each parsed.acceptanceCriteria as ac}
                         <li class="flex items-start">
                           <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full mt-1.5 mr-2"></span>
                           <span class="text-sm text-gray-600">{ac}</span>

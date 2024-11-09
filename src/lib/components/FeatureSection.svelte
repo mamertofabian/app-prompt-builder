@@ -1,33 +1,50 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import ListEditor from './ListEditor.svelte';
   import PresetSection from './PresetSection.svelte';
   import type { ProjectFeature } from '../../data/projectBlueprints';
 
   export let features: string[];
-  export let onFeaturesChange: (features: string[]) => void;
   export let availableFeatures: ProjectFeature[];
   export let projectConfig: {
     needsBackend: boolean;
     needsDatabase: boolean;
   };
 
+  const dispatch = createEventDispatcher<{
+    featuresChange: string[];
+  }>();
+
   let showPresets = false;
 
-  function addFeature(): void {
-    onFeaturesChange([...features, '']);
-  }
+  function handleListChange(event: CustomEvent<{
+    type: 'add' | 'remove' | 'update';
+    index?: number;
+    value?: string;
+  }>) {
+    const { type, index, value } = event.detail;
+    let updatedFeatures: string[];
 
-  function removeFeature(index: number): void {
-    onFeaturesChange(features.filter((_, i) => i !== index));
-  }
+    switch (type) {
+      case 'add':
+        updatedFeatures = [...features, ''];
+        break;
+      case 'remove':
+        updatedFeatures = features.filter((_, i) => i !== index);
+        break;
+      case 'update':
+        updatedFeatures = features.map((item, i) => i === index ? value! : item);
+        break;
+      default:
+        return;
+    }
 
-  function updateFeature(index: number, value: string): void {
-    onFeaturesChange(features.map((item, i) => i === index ? value : item));
+    dispatch('featuresChange', updatedFeatures);
   }
 
   function addPresetFeature(value: string): void {
     if (!features.includes(value)) {
-      onFeaturesChange([...features.filter(f => f !== ''), value]);
+      dispatch('featuresChange', [...features.filter(f => f !== ''), value]);
     }
   }
 </script>
@@ -70,9 +87,7 @@
 
     <ListEditor
       items={features}
-      onAdd={addFeature}
-      onRemove={removeFeature}
-      onChange={updateFeature}
+      on:listChange={handleListChange}
       placeholder="Enter feature"
     />
   </div>
