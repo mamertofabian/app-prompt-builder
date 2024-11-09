@@ -9,6 +9,7 @@
   import StoryDrivenPrompts from "./components/StoryDrivenPrompts.svelte";
   import ProjectManager from "./components/project/ProjectManager.svelte";
   import type { Project } from "./types/project";
+  import { Code } from 'lucide-svelte';
 
   type ProjectType = keyof typeof projectBlueprints;
 
@@ -144,15 +145,20 @@
   }
 </script>
 
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
-  <header class="bg-white shadow-sm border-b border-indigo-100">
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50">
+  <header class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-indigo-100 sticky top-0 z-10">
     <div class="max-w-7xl mx-auto px-4 py-6">
-      <h1 class="text-3xl font-bold text-gray-900">
-        DevGuide Generator
-      </h1>
-      <p class="mt-2 text-gray-600">
-        Create structured development guides and prompts for your projects
-      </p>
+      <div class="flex items-center space-x-3">
+        <Code class="h-8 w-8 text-indigo-600" />
+        <div>
+          <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+            AI Prompt Architect
+          </h1>
+          <p class="mt-1 text-gray-600">
+            Create structured development guides and AI prompts for your projects
+          </p>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -164,7 +170,7 @@
         onStepClick={handleStepClick}
       />
 
-      <div class="bg-white rounded-xl shadow-lg p-6">
+      <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
         {#if currentStep === 0}
           <ProjectManager
             projects={projects}
@@ -204,7 +210,7 @@
         {#if currentStep < steps.length - 1}
           <button
             on:click={handleNext}
-            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
           >
             Next
           </button>
