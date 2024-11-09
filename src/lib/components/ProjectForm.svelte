@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { projectBlueprints } from '../../data/projectBlueprints';
-  import ProjectType from '../App.svelte';
   import ProjectBasicInfo from './ProjectBasicInfo.svelte';
   import FeatureSection from './FeatureSection.svelte';
   import TechStackSection from './TechStackSection.svelte';
@@ -16,7 +15,7 @@
     userStories: string[];
   };
   export let projectConfig: {
-    type: ProjectType;
+    type: keyof typeof projectBlueprints;
     needsBackend: boolean;
     needsDatabase: boolean;
     needsAuthentication: boolean;
@@ -91,14 +90,22 @@
       localStorage.setItem(storageKey, JSON.stringify(dataToStore));
     }
   }
+
+  function handleNameChange(event: CustomEvent<string>) {
+    projectDetails.name = event.detail;
+  }
+
+  function handleDescriptionChange(event: CustomEvent<string>) {
+    projectDetails.description = event.detail;
+  }
 </script>
 
 <div class="space-y-6">
   <ProjectBasicInfo
     name={projectDetails.name}
     description={projectDetails.description}
-    on:nameChange={(e) => projectDetails.name = e.detail}
-    on:descriptionChange={(e) => projectDetails.description = e.detail}
+    on:nameChange={handleNameChange}
+    on:descriptionChange={handleDescriptionChange}
   />
 
   <FeatureSection

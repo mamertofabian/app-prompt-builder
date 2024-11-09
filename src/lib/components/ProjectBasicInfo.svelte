@@ -1,8 +1,13 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
+    
     export let name: string;
     export let description: string;
-    export let onNameChange: (name: string) => void;
-    export let onDescriptionChange: (description: string) => void;
+    
+    const dispatch = createEventDispatcher<{
+        nameChange: string;
+        descriptionChange: string;
+    }>();
 </script>
 
 <div class="space-y-6">
@@ -13,8 +18,8 @@
         <input
             type="text"
             id="name"
-            {name}
-            on:input={(e) => onNameChange(e.currentTarget.value)}
+            value={name}
+            on:input={(e) => dispatch('nameChange', e.currentTarget.value)}
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="Enter your project name"
         />
@@ -27,8 +32,8 @@
         <textarea
             id="description"
             rows="3"
-            {description}
-            on:input={(e) => onDescriptionChange(e.currentTarget.value)}
+            value={description}
+            on:input={(e) => dispatch('descriptionChange', e.currentTarget.value)}
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="Describe your project's purpose and goals"
         />
