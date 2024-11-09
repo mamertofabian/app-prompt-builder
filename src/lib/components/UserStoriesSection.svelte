@@ -1,7 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import { ChevronDown, ChevronRight, Copy, Plus, Edit, Trash2 } from 'lucide-svelte';
+  import { ChevronDown, ChevronRight, Copy, Plus, Edit, Trash2, Loader2 } from 'lucide-svelte';
   import UserStoryForm from './UserStoryForm.svelte';
+  import { generateWithAI } from '../services/openrouter';
 
   export let projectName: string;
   export let features: string[];
@@ -45,6 +46,29 @@
   };
   let selectedStoryIndex = -1;
   let isCollapsed = true;
+  let isGenerating = false;
+  let generationError: string | null = null;
+
+  $: userStoryPrompt = `Help me create detailed user stories for ${projectName}. Consider these core features:
+${features.map(feature => `- ${feature}`).join('\n')}
+
+Please format each user story exactly as follows:
+
+As a [user type/role], I want to [action/goal] so that [benefit/value]
+[Additional description/context about the story]
+
+Acceptance Criteria:
+- Given [context/precondition], when [action occurs], then [expected result]
+- Given [context/precondition], when [action occurs], then [expected result]
+(add more acceptance criteria as needed)
+
+Please:
+1. Focus on user perspective and value
+2. Consider edge cases and error scenarios
+3. Make acceptance criteria specific and testable
+4. Include both happy path and error scenarios
+
+The output should be formatted exactly as shown above to allow easy copying into our user story management system.`;
 
   function parseUserStory(story: string): UserStory {
     const lines = story.split('\n').filter(line => line.trim());
@@ -141,27 +165,36 @@ ${acs}`;
     }).join('\n\n');
   }
 
-  // Generate the user story prompt based on project details
-  $: userStoryPrompt = `Help me create detailed user stories for ${projectName}. Consider these core features:
-${features.map(feature => `- ${feature}`).join('\n')}
+  async function generateUserStories() {
+    isGenerating = true;
+    generationError = null;
 
-Please format each user story exactly as follows:
+    try {
+      const systemPrompt = `You are an expert in writing user stories for software development projects. 
+Format each user story exactly as follows:
 
 As a [user type/role], I want to [action/goal] so that [benefit/value]
 [Additional description/context about the story]
 
 Acceptance Criteria:
 - Given [context/precondition], when [action occurs], then [expected result]
-- Given [context/precondition], when [action occurs], then [expected result]
-(add more acceptance criteria as needed)
+(add 2-3 acceptance criteria per story)`;
 
-Please:
-1. Focus on user perspective and value
-2. Consider edge cases and error scenarios
-3. Make acceptance criteria specific and testable
-4. Include both happy path and error scenarios
+      const result = await generateWithAI(userStoryPrompt, systemPrompt);
+      
+      // Split the generated stories and add them to existing stories
+      const newStories = result
+        .split(/(?=As a )/)
+        .filter(story => story.trim())
+        .map(story => story.trim());
 
-The output should be formatted exactly as shown above to allow easy copying into our user story management system.`;
+      dispatch('userStoriesChange', [...userStories, ...newStories]);
+    } catch (error) {
+      generationError = 'Failed to generate user stories. Please try again.';
+    } finally {
+      isGenerating = false;
+    }
+  }
 </script>
 
 <div class="space-y-6">
@@ -172,19 +205,39 @@ The output should be formatted exactly as shown above to allow easy copying into
         <div>
           <h3 class="text-sm font-medium text-gray-900">User Story Generator</h3>
           <p class="text-xs text-gray-500 mt-1">
-            Use this prompt with an AI assistant to generate user stories
+            Generate user stories using AI or copy the prompt to use with your preferred AI assistant
           </p>
         </div>
-        <button
-          on:click={() => copyToClipboard(userStoryPrompt)}
-          class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-500"
-        >
-          <Copy class="h-4 w-4 mr-1" />
-          Copy Prompt
-        </button>
+        <div class="flex items-center space-x-2">
+          <button
+            on:click={() => copyToClipboard(userStoryPrompt)}
+            class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-500"
+            disabled={isGenerating}
+          >
+            <Copy class="h-4 w-4 mr-1" />
+            Copy Prompt
+          </button>
+          <button
+            on:click={generateUserStories}
+            class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isGenerating}
+          >
+            {#if isGenerating}
+              <Loader2 class="h-4 w-4 mr-1 animate-spin" />
+              Generating...
+            {:else}
+              Generate with AI
+            {/if}
+          </button>
+        </div>
       </div>
     </div>
     <div class="p-4">
+      {#if generationError}
+        <div class="mb-4 bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-600">
+          {generationError}
+        </div>
+      {/if}
       <pre class="text-sm text-gray-600 whitespace-pre-wrap">{userStoryPrompt}</pre>
     </div>
   </div>
