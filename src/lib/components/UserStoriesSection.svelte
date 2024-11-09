@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { ChevronDown, ChevronRight, Copy, Plus, Edit } from 'lucide-svelte';
+  import { ChevronDown, ChevronRight, Copy, Plus, Edit, Trash2 } from 'lucide-svelte';
   import UserStoryForm from './UserStoryForm.svelte';
 
   export let projectName: string;
@@ -90,6 +90,11 @@
     selectedStoryIndex = index;
     editingStory = parseUserStory(userStories[index]);
     isEditing = true;
+  }
+
+  function handleDeleteStory(index: number) {
+    const updatedStories = userStories.filter((_, i) => i !== index);
+    dispatch('userStoriesChange', updatedStories);
   }
 
   function handleSaveStory() {
@@ -257,13 +262,22 @@ The output should be formatted exactly as shown above to allow easy copying into
                       </ul>
                     </div>
                   </div>
-                  <button
-                    on:click={() => handleEditStory(index)}
-                    class="ml-4 p-2 text-gray-400 hover:text-indigo-600"
-                    title="Edit story"
-                  >
-                    <Edit class="h-5 w-5" />
-                  </button>
+                  <div class="flex items-start space-x-2 ml-4">
+                    <button
+                      on:click={() => handleEditStory(index)}
+                      class="p-2 text-gray-400 hover:text-indigo-600"
+                      title="Edit story"
+                    >
+                      <Edit class="h-5 w-5" />
+                    </button>
+                    <button
+                      on:click={() => handleDeleteStory(index)}
+                      class="p-2 text-gray-400 hover:text-red-600"
+                      title="Delete story"
+                    >
+                      <Trash2 class="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             {/each}
