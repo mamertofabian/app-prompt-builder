@@ -1,13 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { phases } from "../data/phases";
+  import { projectBlueprints } from "../data/projectBlueprints";
   import ProjectForm from "./components/ProjectForm.svelte";
   import WizardNavigation from "./components/WizardNavigation.svelte";
   import PhaseAccordion from "./components/PhaseAccordion.svelte";
   import ProjectTypeSelector from "./components/ProjectTypeSelector.svelte";
   import GuidelinesSection from "./components/GuidelinesSection.svelte";
   import StoryDrivenPrompts from "./components/StoryDrivenPrompts.svelte";
-  import { projectBlueprints } from "../data/projectBlueprints";
+  import ProjectManager from "./components/project/ProjectManager.svelte";
+  import type { Project } from "./types/project";
 
   type ProjectType = keyof typeof projectBlueprints;
 
@@ -27,14 +28,16 @@
     userStories: [""],
   };
 
-  const copyToClipboard = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-  };
+  // Project management state
+  let projects: Project[] = [];
+  let loadingProjects = false;
+  let projectError: string | null = null;
+  let selectedProject: Project | null = null;
 
   const steps = [
     {
-      title: "Project Type",
-      component: ProjectTypeSelector,
+      title: "Project Selection",
+      component: ProjectManager,
     },
     {
       title: "Project Details",
@@ -66,22 +69,73 @@
     projectConfig = newConfig;
   }
 
-  $: filteredPhases = phases.filter((phase) => {
-    if (phase.title === "Project Definition") return true;
-    if (phase.title === "Backend Development") {
-      return projectConfig.needsBackend;
+  function handleProjectSelect(event: CustomEvent<Project>) {
+    selectedProject = event.detail;
+    projectDetails = {
+      name: selectedProject.name,
+      description: selectedProject.description,
+      features: selectedProject.features,
+      techStack: selectedProject.techStack,
+      userStories: selectedProject.userStories
+    };
+    projectConfig.type = selectedProject.type as ProjectType;
+    handleNext();
+  }
+
+  function handleProjectCreate(event: CustomEvent<Project>) {
+    projects = [...projects, event.detail];
+    selectedProject = event.detail;
+    handleProjectSelect(event);
+  }
+
+  function handleProjectUpdate(event: CustomEvent<Project>) {
+    projects = projects.map(p => p.id === event.detail.id ? event.detail : p);
+    selectedProject = event.detail;
+    handleProjectSelect(event);
+  }
+
+  function handleProjectDelete(event: CustomEvent<{ id: string }>) {
+    projects = projects.filter(p => p.id !== event.detail.id);
+    if (selectedProject?.id === event.detail.id) {
+      selectedProject = null;
+      projectDetails = {
+        name: "",
+        description: "",
+        features: [""],
+        techStack: [""],
+        userStories: [""],
+      };
     }
-    return false;
+  }
+
+  // Load projects on mount
+  onMount(async () => {
+    loadingProjects = true;
+    try {
+      // Simulated API call - replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const storedProjects = localStorage.getItem('projects');
+      if (storedProjects) {
+        projects = JSON.parse(storedProjects, (key, value) => {
+          if (key === 'createdAt' || key === 'updatedAt') {
+            return new Date(value);
+          }
+          return value;
+        });
+      }
+    } catch (error) {
+      projectError = 'Failed to load projects';
+    } finally {
+      loadingProjects = false;
+    }
   });
 
-  $: deploymentPhases = phases.filter((phase) => {
-    if (
-      phase.title === "Testing & Deployment" ||
-      phase.title === "Debugging & Optimization"
-    )
-      return true;
-    return false;
-  });
+  // Save projects to localStorage whenever they change
+  $: {
+    if (projects.length > 0) {
+      localStorage.setItem('projects', JSON.stringify(projects));
+    }
+  }
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
@@ -106,9 +160,14 @@
 
       <div class="bg-white rounded-xl shadow-lg p-6">
         {#if currentStep === 0}
-          <ProjectTypeSelector
-            bind:projectConfig
-            onProjectConfigUpdate={handleProjectConfigUpdate}
+          <ProjectManager
+            projects={projects}
+            loading={loadingProjects}
+            error={projectError}
+            on:select={handleProjectSelect}
+            on:create={handleProjectCreate}
+            on:update={handleProjectUpdate}
+            on:delete={handleProjectDelete}
           />
         {:else if currentStep === 1}
           <ProjectForm
@@ -118,61 +177,11 @@
         {:else}
           <div class="space-y-8">
             <GuidelinesSection />
-
-            <div class="space-y-6">
-              <div>
-                <h2 class="text-lg font-medium text-gray-900">
-                  Project Setup & Structure
-                </h2>
-                <p class="mt-1 text-sm text-gray-500">
-                  Initial project setup and architecture guidelines
-                </p>
-              </div>
-
-              <PhaseAccordion
-                phases={filteredPhases}
-                {projectDetails}
-                {projectConfig}
-                onCopy={copyToClipboard}
-                expandAll={true}
-              />
-            </div>
-
-            <div class="space-y-6">
-              <div>
-                <h2 class="text-lg font-medium text-gray-900">
-                  Story-Driven Development
-                </h2>
-                <p class="mt-1 text-sm text-gray-500">
-                  Select a user story to get phase-specific development prompts
-                </p>
-              </div>
-
-              <StoryDrivenPrompts
-                {projectDetails}
-                {projectConfig}
-                onNavigateToStep={handleStepClick}
-              />
-            </div>
-
-            <div class="space-y-6">
-              <div>
-                <h2 class="text-lg font-medium text-gray-900">
-                  Deployment & Operations
-                </h2>
-                <p class="mt-1 text-sm text-gray-500">
-                  Guidelines for deploying and maintaining your application
-                </p>
-              </div>
-
-              <PhaseAccordion
-                phases={deploymentPhases}
-                {projectDetails}
-                {projectConfig}
-                onCopy={copyToClipboard}
-                expandAll={true}
-              />
-            </div>
+            <StoryDrivenPrompts
+              {projectDetails}
+              {projectConfig}
+              onNavigateToStep={handleStepClick}
+            />
           </div>
         {/if}
       </div>
