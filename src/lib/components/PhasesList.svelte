@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import { ChevronDown, ChevronRight, Copy } from 'lucide-svelte';
   import PromptGenerator from './PromptGenerator.svelte';
+  import DiagramGenerator from './DiagramGenerator.svelte';
   import type { Phase } from '../storyDrivenTypes';
 
   export let phases: Phase[];
@@ -13,6 +14,7 @@
     phaseToggle: string;
     copy: string;
     generated: { phase: string; content: string; };
+    diagramGenerated: { phase: string; diagram: string; };
   }>();
 
   function handlePhaseToggle(phaseTitle: string) {
@@ -25,6 +27,10 @@
 
   function handleGenerated(phase: Phase, content: string) {
     dispatch('generated', { phase: phase.title, content });
+  }
+
+  function handleDiagramGenerated(phase: Phase, diagram: string) {
+    dispatch('diagramGenerated', { phase: phase.title, diagram });
   }
 
   const systemPrompts = {
@@ -53,6 +59,63 @@
 4. Backup strategies
 5. Security measures`
   };
+
+  const diagramPrompts = {
+    'Project Definition': `Create a Mermaid diagram showing the architecture for this project:
+
+Project: [PROJECT_NAME]
+Description: [PROJECT_DESCRIPTION]
+Features: [FEATURES]
+Tech Stack: [TECH_STACK]
+
+Please create a diagram that shows:
+1. Main system components
+2. Data flow between components
+3. External integrations
+4. Key architectural patterns
+
+Use appropriate Mermaid syntax (flowchart, C4, etc.) and include clear labels and relationships.`,
+    'UI Implementation': `Create a Mermaid diagram showing the component hierarchy for this project:
+
+Project: [PROJECT_NAME]
+Features: [FEATURES]
+
+Please create a diagram that shows:
+1. Component tree structure
+2. Key component relationships
+3. Data flow between components
+4. State management overview
+
+Use Mermaid flowchart syntax and include clear labels and relationships.`,
+    'Testing': `Create a Mermaid diagram showing the testing strategy for this project:
+
+Project: [PROJECT_NAME]
+Features: [FEATURES]
+
+Please create a diagram that shows:
+1. Test types and hierarchy
+2. Test flow and dependencies
+3. Integration points
+4. CI/CD test stages
+
+Use Mermaid flowchart syntax and include clear labels and relationships.`,
+    'Deployment': `Create a Mermaid diagram showing the deployment architecture for this project:
+
+Project: [PROJECT_NAME]
+Tech Stack: [TECH_STACK]
+
+Please create a diagram that shows:
+1. Deployment environments
+2. Infrastructure components
+3. CI/CD pipeline flow
+4. Monitoring and logging
+
+Use Mermaid flowchart syntax and include clear labels and relationships.`
+  };
+
+  function shouldShowDiagram(phase: Phase): boolean {
+    return phase.title in diagramPrompts;
+  }
 </script>
 
 <div class="space-y-4">
@@ -81,6 +144,15 @@
               prompt={formatPrompt(phase.prompt)}
               systemPrompt={systemPrompts[phase.title]}
               on:generated={(e) => handleGenerated(phase, e.detail)}
+            />
+          {/if}
+
+          {#if shouldShowDiagram(phase)}
+            <DiagramGenerator
+              title={`Generate ${phase.title} Diagram`}
+              prompt={formatPrompt(diagramPrompts[phase.title])}
+              systemPrompt="You are an expert in creating Mermaid diagrams. Generate clear, well-structured diagrams that effectively communicate system architecture and relationships. Use appropriate Mermaid syntax and include comprehensive labels and descriptions."
+              on:generated={(e) => handleDiagramGenerated(phase, e.detail)}
             />
           {/if}
           

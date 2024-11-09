@@ -5,6 +5,7 @@
   import PhasesList from './PhasesList.svelte';
   import StoryDetails from './StoryDetails.svelte';
   import StorySelector from './StorySelector.svelte';
+  import MermaidViewer from './MermaidViewer.svelte';
   import { ArrowLeft } from 'lucide-svelte';
 
   export let projectDetails: {
@@ -26,6 +27,7 @@
   let selectedStoryIndex = -1;
   let expandedPhases: string[] = [];
   let generatedContent: Record<string, string> = {};
+  let generatedDiagrams: Record<string, string> = {};
 
   // Split phases into project-level and story-level
   $: projectPhases = developmentPhases.filter(phase => 
@@ -97,6 +99,11 @@
     const { phase, content } = event.detail;
     generatedContent[phase] = content;
   }
+
+  function handleDiagramGenerated(event: CustomEvent<{ phase: string; diagram: string }>) {
+    const { phase, diagram } = event.detail;
+    generatedDiagrams[phase] = diagram;
+  }
 </script>
 
 <div class="space-y-8">
@@ -110,11 +117,18 @@
       on:phaseToggle={e => handlePhaseToggle(e.detail)}
       on:copy={e => copyToClipboard(e.detail)}
       on:generated={handleGenerated}
+      on:diagramGenerated={handleDiagramGenerated}
     />
     {#if generatedContent['Project Definition']}
       <div class="mt-4 p-4 bg-gray-50 rounded-lg">
         <h3 class="text-sm font-medium text-gray-900 mb-2">Generated Architecture & Structure</h3>
         <pre class="text-sm text-gray-600 whitespace-pre-wrap">{generatedContent['Project Definition']}</pre>
+      </div>
+    {/if}
+    {#if generatedDiagrams['Project Definition']}
+      <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-900 mb-2">Architecture Diagram</h3>
+        <MermaidViewer diagram={generatedDiagrams['Project Definition']} />
       </div>
     {/if}
   </div>
@@ -169,6 +183,7 @@
             on:phaseToggle={e => handlePhaseToggle(e.detail)}
             on:copy={e => copyToClipboard(e.detail)}
             on:generated={handleGenerated}
+            on:diagramGenerated={handleDiagramGenerated}
           />
 
           {#each storyPhases as phase}
@@ -176,6 +191,12 @@
               <div class="mt-4 p-4 bg-gray-50 rounded-lg">
                 <h3 class="text-sm font-medium text-gray-900 mb-2">Generated {phase.title}</h3>
                 <pre class="text-sm text-gray-600 whitespace-pre-wrap">{generatedContent[phase.title]}</pre>
+              </div>
+            {/if}
+            {#if generatedDiagrams[phase.title]}
+              <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                <h3 class="text-sm font-medium text-gray-900 mb-2">{phase.title} Diagram</h3>
+                <MermaidViewer diagram={generatedDiagrams[phase.title]} />
               </div>
             {/if}
           {/each}

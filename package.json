@@ -10,7 +10,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
-    "lucide-svelte": "^0.344.0"
+    "lucide-svelte": "^0.344.0",
+    "mermaid": "^10.9.3"
   },
   "devDependencies": {
     "@melt-ui/pp": "^0.3.2",
