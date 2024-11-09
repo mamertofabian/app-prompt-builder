@@ -1,5 +1,5 @@
-import { Code, Globe, Database, Smartphone, Chrome, Server, Layout } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Code, Globe, Database, Smartphone, Chrome, Server, Layout } from 'lucide-svelte';
+import type { LucideIcon } from 'lucide-svelte';
 
 export interface ProjectFeature {
   id: string;
