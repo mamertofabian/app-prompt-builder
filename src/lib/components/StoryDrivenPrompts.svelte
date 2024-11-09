@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { UserStory, ProjectType } from '../storyDrivenTypes';
   import { developmentPhases } from '../storyDrivenTypes';
-  import UserStoryEditor from './UserStoryEditor.svelte';
   import NoStoriesPlaceholder from './NoStoriesPlaceholder.svelte';
   import PhasesList from './PhasesList.svelte';
   import StoryDetails from './StoryDetails.svelte';
   import StorySelector from './StorySelector.svelte';
+  import { ArrowLeft } from 'lucide-svelte';
 
   export let projectDetails: {
     name: string;
@@ -20,38 +20,28 @@
     needsBackend: boolean;
   };
 
+  export let onNavigateToStep: (step: number) => void;
+
   let selectedStoryIndex = -1;
   let expandedPhases: string[] = [];
-  let isEditing = false;
-  let editingStory: UserStory = {
-    title: "",
-    description: "",
-    acceptanceCriteria: [""]
-  };
 
   function parseUserStory(story: string): UserStory {
-    const lines = story.split("\n").filter((line) => line.trim());
-    const title = lines[0] || "";
-    const acStart = lines.findIndex((line) =>
-      line.toLowerCase().includes("acceptance criteria:")
-    );
+    const lines = story.split('\n').filter(line => line.trim());
+    const titleMatch = lines[0]?.match(/As a (.*?), I want to (.*?) so that (.*?)$/i) || [];
+    
+    const title = titleMatch[0] || '';
+    const description = lines.slice(1, lines.findIndex(line => 
+      line.toLowerCase().includes('acceptance criteria:')
+    )).join('\n');
 
-    const description = acStart > 0
-      ? lines.slice(1, acStart).join("\n")
-      : lines.slice(1).join("\n");
-
-    const acceptanceCriteria = acStart > 0
-      ? lines.slice(acStart + 1)
-          .map((ac) => ac.replace(/^[-*]\s*/, "").trim())
-      : [];
+    const acceptanceCriteria = lines
+      .slice(lines.findIndex(line => 
+        line.toLowerCase().includes('acceptance criteria:')
+      ) + 1)
+      .map(line => line.replace(/^[-*]\s*/, ''))
+      .filter(line => line);
 
     return { title, description, acceptanceCriteria };
-  }
-
-  function formatUserStory(story: UserStory): string {
-    return `${story.title}\n${story.description}\n\nAcceptance Criteria:\n${
-      story.acceptanceCriteria.map((ac) => `- ${ac}`).join("\n")
-    }`;
   }
 
   function handlePhaseToggle(phaseTitle: string) {
@@ -70,9 +60,7 @@
       .replace(/\[TECH_STACK\]/g, projectDetails.techStack.join("\n- "))
       .replace(
         /\[SELECTED_STORY\]/g,
-        selectedStory
-          ? `${selectedStory.title}\n${selectedStory.description}`
-          : ""
+        selectedStory ? `${selectedStory.title}\n${selectedStory.description}` : ""
       )
       .replace(
         /\[ACCEPTANCE_CRITERIA\]/g,
@@ -92,70 +80,57 @@
       return false;
     return true;
   });
-
-  function handleEditStory(index: number) {
-    selectedStoryIndex = index;
-    editingStory = parseUserStory(projectDetails.userStories[index]);
-    isEditing = true;
-  }
-
-  function handleSaveStory() {
-    const formattedStory = formatUserStory(editingStory);
-    const updatedStories = [...projectDetails.userStories];
-
-    if (selectedStoryIndex >= 0) {
-      updatedStories[selectedStoryIndex] = formattedStory;
-    } else {
-      updatedStories.push(formattedStory);
-    }
-
-    // Update project details
-    projectDetails.userStories = updatedStories;
-
-    isEditing = false;
-    editingStory = { title: "", description: "", acceptanceCriteria: [""] };
-  }
 </script>
 
-{#if projectDetails.userStories.length === 0 && !isEditing}
-  <NoStoriesPlaceholder on:addStory={() => isEditing = true} />
-{:else if isEditing}
-  <UserStoryEditor
-    bind:editingStory
-    on:save={handleSaveStory}
-    on:cancel={() => isEditing = false}
-  />
-{:else}
-  <div class="space-y-6">
-    <StorySelector
-      {selectedStoryIndex}
-      userStories={projectDetails.userStories}
-      on:storySelect={(e) => selectedStoryIndex = e.detail}
-      on:addStory={() => isEditing = true}
-      {parseUserStory}
-    />
+<div class="space-y-6">
+  {#if projectDetails.userStories.length === 0}
+    <div class="text-center py-12">
+      <h3 class="text-lg font-medium text-gray-900">
+        No User Stories Found
+      </h3>
+      <p class="mt-2 text-sm text-gray-500">
+        Go back to step 2 to add user stories first.
+      </p>
+      <button
+        on:click={() => onNavigateToStep(1)}
+        class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+      >
+        <ArrowLeft class="h-4 w-4 mr-2" />
+        Go to User Stories
+      </button>
+    </div>
+  {:else}
+    <div class="space-y-6">
+      <div class="flex justify-between items-center">
+        <StorySelector
+          {selectedStoryIndex}
+          userStories={projectDetails.userStories}
+          on:storySelect={(e) => selectedStoryIndex = e.detail}
+          {parseUserStory}
+        />
+        <button
+          on:click={() => onNavigateToStep(1)}
+          class="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+        >
+          <ArrowLeft class="h-4 w-4 mr-2" />
+          Edit Stories
+        </button>
+      </div>
 
-    {#if selectedStoryIndex >= 0}
-      <StoryDetails
-        story={parseUserStory(projectDetails.userStories[selectedStoryIndex])}
-        on:edit={() => handleEditStory(selectedStoryIndex)}
-      />
+      {#if selectedStoryIndex >= 0}
+        <StoryDetails
+          story={parseUserStory(projectDetails.userStories[selectedStoryIndex])}
+          readOnly={true}
+        />
 
-      <PhasesList
-        phases={filteredPhases}
-        {expandedPhases}
-        {formatPrompt}
-        on:phaseToggle={e => handlePhaseToggle(e.detail)}
-        on:copy={e => copyToClipboard(e.detail)}
-      />
-    {/if}
-  </div>
-{/if}
-
-<style>
-  .space-y-6 {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-</style>
+        <PhasesList
+          phases={filteredPhases}
+          {expandedPhases}
+          {formatPrompt}
+          on:phaseToggle={e => handlePhaseToggle(e.detail)}
+          on:copy={e => copyToClipboard(e.detail)}
+        />
+      {/if}
+    </div>
+  {/if}
+</div>

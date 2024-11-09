@@ -151,6 +151,7 @@
               <StoryDrivenPrompts
                 {projectDetails}
                 {projectConfig}
+                onNavigateToStep={handleStepClick}
               />
             </div>
 
