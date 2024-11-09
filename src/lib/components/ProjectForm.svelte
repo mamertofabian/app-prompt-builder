@@ -1,13 +1,15 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { projectBlueprints } from '../../data/projectBlueprints';
-  import ProjectBasicInfo from './ProjectBasicInfo.svelte';
+  import { createEventDispatcher } from 'svelte';
+  import ListEditor from './ListEditor.svelte';
   import FeatureSection from './FeatureSection.svelte';
   import TechStackSection from './TechStackSection.svelte';
   import UserStoriesSection from './UserStoriesSection.svelte';
+  import ProjectBasicInfo from './ProjectBasicInfo.svelte';
+  import { projectBlueprints } from '../../data/projectBlueprints';
 
   // Props
   export let projectDetails: {
+    id: string;
     name: string;
     description: string;
     features: string[];
@@ -45,7 +47,7 @@
       .map(t => t.name);
 
     if (isInitialLoad) {
-      const storageKey = `project_type_${projectConfig.type}`;
+      const storageKey = `project_${projectDetails.id}`;
       const storedData = localStorage.getItem(storageKey);
 
       if (!storedData) {
@@ -81,7 +83,7 @@
   // Storage handling
   $: {
     if (!isInitialLoad) {
-      const storageKey = `project_type_${projectConfig.type}`;
+      const storageKey = `project_${projectDetails.id}`;
       const dataToStore = {
         features: projectDetails.features,
         techStack: projectDetails.techStack,

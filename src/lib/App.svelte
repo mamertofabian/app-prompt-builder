@@ -21,6 +21,7 @@
   };
 
   let projectDetails = {
+    id: "",
     name: "",
     description: "",
     features: [""],
@@ -72,6 +73,7 @@
   function handleProjectSelect(event: CustomEvent<Project>) {
     selectedProject = event.detail;
     projectDetails = {
+      id: selectedProject.id,
       name: selectedProject.name,
       description: selectedProject.description,
       features: selectedProject.features,
@@ -95,10 +97,14 @@
   }
 
   function handleProjectDelete(event: CustomEvent<{ id: string }>) {
+    // Remove project data from localStorage
+    localStorage.removeItem(`project_${event.detail.id}`);
+    
     projects = projects.filter(p => p.id !== event.detail.id);
     if (selectedProject?.id === event.detail.id) {
       selectedProject = null;
       projectDetails = {
+        id: "",
         name: "",
         description: "",
         features: [""],
@@ -176,7 +182,6 @@
           />
         {:else}
           <div class="space-y-8">
-            <!-- <GuidelinesSection /> -->
             <StoryDrivenPrompts
               {projectDetails}
               {projectConfig}
