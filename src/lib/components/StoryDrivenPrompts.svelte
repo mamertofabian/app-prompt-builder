@@ -54,13 +54,13 @@
     }`;
   }
 
-  function togglePhase(phaseTitle: string) {
+  function handlePhaseToggle(phaseTitle: string) {
     expandedPhases = expandedPhases.includes(phaseTitle)
       ? expandedPhases.filter((t) => t !== phaseTitle)
       : [...expandedPhases, phaseTitle];
   }
 
-  function formatPrompt(prompt: string) {
+  function formatPrompt(prompt: string): string {
     const selectedStory = selectedStoryIndex >= 0
       ? parseUserStory(projectDetails.userStories[selectedStoryIndex])
       : null;
@@ -109,8 +109,8 @@
       updatedStories.push(formattedStory);
     }
 
-    // Update project details (you'll need to implement this)
-    console.log("Updated stories:", updatedStories);
+    // Update project details
+    projectDetails.userStories = updatedStories;
 
     isEditing = false;
     editingStory = { title: "", description: "", acceptanceCriteria: [""] };
@@ -144,9 +144,9 @@
       <PhasesList
         phases={filteredPhases}
         {expandedPhases}
-        on:phaseToggle={(e) => togglePhase(e.detail)}
         {formatPrompt}
-        on:copy={(e) => copyToClipboard(e.detail)}
+        on:phaseToggle={e => handlePhaseToggle(e.detail)}
+        on:copy={e => copyToClipboard(e.detail)}
       />
     {/if}
   </div>

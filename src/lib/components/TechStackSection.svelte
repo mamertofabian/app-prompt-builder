@@ -1,33 +1,50 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import ListEditor from './ListEditor.svelte';
   import PresetSection from './PresetSection.svelte';
   import type { TechStackItem } from '../../data/projectBlueprints';
 
   export let techStack: string[];
-  export let onTechStackChange: (techStack: string[]) => void;
   export let availableTech: TechStackItem[];
   export let projectConfig: {
     needsBackend: boolean;
     needsDatabase: boolean;
   };
 
+  const dispatch = createEventDispatcher<{
+    techStackChange: string[];
+  }>();
+
   let showPresets = false;
 
-  function addTech(): void {
-    onTechStackChange([...techStack, '']);
-  }
+  function handleListChange(event: CustomEvent<{
+    type: 'add' | 'remove' | 'update';
+    index?: number;
+    value?: string;
+  }>) {
+    const { type, index, value } = event.detail;
+    let updatedTechStack: string[];
 
-  function removeTech(index: number): void {
-    onTechStackChange(techStack.filter((_, i) => i !== index));
-  }
+    switch (type) {
+      case 'add':
+        updatedTechStack = [...techStack, ''];
+        break;
+      case 'remove':
+        updatedTechStack = techStack.filter((_, i) => i !== index);
+        break;
+      case 'update':
+        updatedTechStack = techStack.map((item, i) => i === index ? value! : item);
+        break;
+      default:
+        return;
+    }
 
-  function updateTech(index: number, value: string): void {
-    onTechStackChange(techStack.map((item, i) => i === index ? value : item));
+    dispatch('techStackChange', updatedTechStack);
   }
 
   function addPresetTech(value: string): void {
     if (!techStack.includes(value)) {
-      onTechStackChange([...techStack.filter(t => t !== ''), value]);
+      dispatch('techStackChange', [...techStack.filter(t => t !== ''), value]);
     }
   }
 </script>
@@ -70,9 +87,7 @@
 
     <ListEditor
       items={techStack}
-      onAdd={addTech}
-      onRemove={removeTech}
-      onChange={updateTech}
+      on:listChange={handleListChange}
       placeholder="Enter technology"
     />
   </div>
