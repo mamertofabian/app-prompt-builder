@@ -16,8 +16,32 @@ export interface Phase {
 
 export const developmentPhases: Phase[] = [
   {
+    title: "Project Definition",
+    description: "Define the core aspects and architecture of your project",
+    prompt: `Project Type: [PROJECT_TYPE]
+
+Project Name: [PROJECT_NAME]
+Description: [PROJECT_DESCRIPTION]
+
+Core Features:
+[FEATURES]
+
+Tech Stack:
+[TECH_STACK]
+
+Please help me:
+1. Define the project architecture
+2. Set up the initial project structure
+3. Configure the development environment
+4. Outline the development phases
+5. Identify potential technical challenges
+
+Focus on creating a solid foundation for development while considering scalability and maintainability.`,
+    applicableTo: ["static", "fullstack", "backend", "mobile"],
+  },
+  {
     title: "UI Implementation",
-    description: "Design and implement the user interface for this story",
+    description: "Design and implement the user interface components",
     prompt: `Implement the UI components for the following user story:
 
 [SELECTED_STORY]
@@ -39,7 +63,7 @@ Please provide:
   },
   {
     title: "Backend Implementation",
-    description: "Implement the backend functionality for this story",
+    description: "Implement the server-side functionality",
     prompt: `Implement the backend functionality for the following user story:
 
 [SELECTED_STORY]
@@ -60,8 +84,27 @@ Please provide:
     requiresBackend: true,
   },
   {
+    title: "Database Design",
+    description: "Design and implement the database schema and operations",
+    prompt: `Design the database schema and operations for:
+
+[SELECTED_STORY]
+
+Project Context:
+- Project Type: [PROJECT_TYPE]
+- Tech Stack: [TECH_STACK]
+
+Please provide:
+1. Database schema design
+2. Table relationships
+3. Required indexes
+4. Data access patterns
+5. Migration strategy`,
+    requiresBackend: true,
+  },
+  {
     title: "Testing",
-    description: "Create tests for this user story implementation",
+    description: "Create comprehensive tests for the implementation",
     prompt: `Create tests for the following user story:
 
 [SELECTED_STORY]
@@ -79,7 +122,27 @@ Please provide:
 3. UI tests (if applicable)
 4. Test data setup
 5. Edge cases to consider`,
+    applicableTo: ["static", "fullstack", "backend", "mobile"],
   },
+  {
+    title: "Deployment",
+    description: "Set up deployment and hosting configuration",
+    prompt: `Create deployment configuration for:
+
+Project Type: [PROJECT_TYPE]
+Tech Stack: [TECH_STACK]
+
+Features to deploy:
+[FEATURES]
+
+Please provide:
+1. Environment configuration
+2. Build process setup
+3. Deployment pipeline
+4. Monitoring setup
+5. Backup strategy`,
+    applicableTo: ["static", "fullstack", "backend", "mobile"],
+  }
 ];
 
 export interface StoryDrivenPromptsProps {
